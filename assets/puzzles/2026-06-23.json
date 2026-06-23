@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "date": "2026-06-23",
+  "puzzles": [
+    {
+      "emoji": "🦁👑",
+      "category": "Movie",
+      "hint": "A cub becomes king of the savanna.",
+      "answer": "The Lion King",
+      "options": ["The Lion King", "Madagascar", "The Jungle Book", "Brave"]
+    },
+    {
+      "emoji": "🕸️🕷️🦸",
+      "category": "Movie",
+      "hint": "Your friendly neighbourhood hero.",
+      "answer": "Spider-Man",
+      "options": ["Spider-Man", "Batman", "Superman", "Ant-Man"]
+    },
+    {
+      "emoji": "🧊❄️👸",
+      "category": "Movie",
+      "hint": "Let it go…",
+      "answer": "Frozen",
+      "options": ["Frozen", "Moana", "Tangled", "Brave"]
+    },
+    {
+      "emoji": "🚀🌌⏰",
+      "category": "Movie",
+      "hint": "Time dilates near a black hole.",
+      "answer": "Interstellar",
+      "options": ["Interstellar", "Gravity", "The Martian", "Apollo 13"]
+    },
+    {
+      "emoji": "🐠🔍🌊",
+      "category": "Movie",
+      "hint": "Just keep swimming.",
+      "answer": "Finding Dory",
+      "options": ["Finding Dory", "Finding Nemo", "Moana", "The Little Mermaid"]
+    }
+  ]
+}

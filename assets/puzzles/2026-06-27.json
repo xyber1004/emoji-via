@@ -1,0 +1,41 @@
+{
+  "id": 5,
+  "date": "2026-06-27",
+  "puzzles": [
+    {
+      "emoji": "🍎💻📱",
+      "category": "Brand",
+      "hint": "Think different.",
+      "answer": "Apple",
+      "options": ["Apple", "Samsung", "Microsoft", "Google"]
+    },
+    {
+      "emoji": "🚂⏰🏔️",
+      "category": "Movie",
+      "hint": "All aboard on Christmas Eve.",
+      "answer": "The Polar Express",
+      "options": ["The Polar Express", "Elf", "Home Alone", "A Christmas Story"]
+    },
+    {
+      "emoji": "🎪🤡🎈",
+      "category": "Movie",
+      "hint": "We all float down here.",
+      "answer": "IT",
+      "options": ["IT", "Clue", "The Shining", "Get Out"]
+    },
+    {
+      "emoji": "🌊🏄🐢",
+      "category": "Movie",
+      "hint": "A surfer catches a massive wave.",
+      "answer": "Surf's Up",
+      "options": ["Surf's Up", "Luca", "Moana", "The Reef"]
+    },
+    {
+      "emoji": "👨‍🍳🐭🍽️",
+      "category": "Movie",
+      "hint": "Anyone can cook.",
+      "answer": "Ratatouille",
+      "options": ["Ratatouille", "Chef", "Julie & Julia", "The Hundred-Foot Journey"]
+    }
+  ]
+}

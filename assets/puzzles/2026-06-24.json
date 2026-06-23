@@ -1,0 +1,41 @@
+{
+  "id": 2,
+  "date": "2026-06-24",
+  "puzzles": [
+    {
+      "emoji": "⚡🧙📚",
+      "category": "Book / Movie",
+      "hint": "The boy who lived.",
+      "answer": "Harry Potter",
+      "options": ["Harry Potter", "The Hobbit", "Percy Jackson", "Narnia"]
+    },
+    {
+      "emoji": "🤖💔🌱",
+      "category": "Movie",
+      "hint": "A lonely robot on a deserted Earth.",
+      "answer": "WALL-E",
+      "options": ["WALL-E", "Robots", "Big Hero 6", "Finch"]
+    },
+    {
+      "emoji": "🦖🌿🏝️",
+      "category": "Movie",
+      "hint": "Life finds a way.",
+      "answer": "Jurassic Park",
+      "options": ["Jurassic Park", "The Lost World", "Land Before Time", "Prehistoric Planet"]
+    },
+    {
+      "emoji": "🎸🎵🤘",
+      "category": "Movie",
+      "hint": "The story of Queen.",
+      "answer": "Bohemian Rhapsody",
+      "options": ["Bohemian Rhapsody", "Rocketman", "Yesterday", "Almost Famous"]
+    },
+    {
+      "emoji": "🍕🛵🇮🇹",
+      "category": "Food",
+      "hint": "Italy's most iconic export.",
+      "answer": "Pizza",
+      "options": ["Pizza", "Pasta", "Lasagna", "Risotto"]
+    }
+  ]
+}

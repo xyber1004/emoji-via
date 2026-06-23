@@ -1,0 +1,41 @@
+{
+  "id": 4,
+  "date": "2026-06-26",
+  "puzzles": [
+    {
+      "emoji": "🪐💫🌌",
+      "category": "Movie",
+      "hint": "May the Force be with you.",
+      "answer": "Star Wars",
+      "options": ["Star Wars", "Guardians of the Galaxy", "Dune", "Avatar"]
+    },
+    {
+      "emoji": "🌪️🌈👠🦁",
+      "category": "Movie",
+      "hint": "There's no place like home.",
+      "answer": "The Wizard of Oz",
+      "options": ["The Wizard of Oz", "Alice in Wonderland", "Labyrinth", "Fantasia"]
+    },
+    {
+      "emoji": "🎃👻🕷️",
+      "category": "Movie",
+      "hint": "This is Halloween.",
+      "answer": "The Nightmare Before Christmas",
+      "options": ["The Nightmare Before Christmas", "Halloween", "Coraline", "Corpse Bride"]
+    },
+    {
+      "emoji": "🏖️🌊🦈",
+      "category": "Movie",
+      "hint": "You're gonna need a bigger boat.",
+      "answer": "Jaws",
+      "options": ["Jaws", "Deep Blue Sea", "The Meg", "Piranha"]
+    },
+    {
+      "emoji": "🐉🔥👸",
+      "category": "TV",
+      "hint": "Winter is coming.",
+      "answer": "Game of Thrones",
+      "options": ["Game of Thrones", "The Witcher", "Rings of Power", "House of the Dragon"]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": 3,
+  "date": "2026-06-25",
+  "puzzles": [
+    {
+      "emoji": "🔴💊🐇🕳️",
+      "category": "Movie",
+      "hint": "There is no spoon.",
+      "answer": "The Matrix",
+      "options": ["The Matrix", "Inception", "Dark City", "Total Recall"]
+    },
+    {
+      "emoji": "🦇🃏🌃",
+      "category": "Movie",
+      "hint": "Why so serious?",
+      "answer": "The Dark Knight",
+      "options": ["The Dark Knight", "Batman v Superman", "Batman Returns", "Joker"]
+    },
+    {
+      "emoji": "🐼🥊🎬",
+      "category": "Movie",
+      "hint": "Skadoosh!",
+      "answer": "Kung Fu Panda",
+      "options": ["Kung Fu Panda", "Ratatouille", "Over the Hedge", "Open Season"]
+    },
+    {
+      "emoji": "👒🤠🐍",
+      "category": "Movie",
+      "hint": "It belongs in a museum.",
+      "answer": "Indiana Jones",
+      "options": ["Indiana Jones", "The Mummy", "National Treasure", "Lara Croft"]
+    },
+    {
+      "emoji": "🧠🔬⚗️",
+      "category": "TV",
+      "hint": "Say my name.",
+      "answer": "Breaking Bad",
+      "options": ["Breaking Bad", "Better Call Saul", "Ozark", "Dexter"]
+    }
+  ]
+}

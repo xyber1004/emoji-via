@@ -1,0 +1,1 @@
+enum AnswerOutcome { correct, wrong }

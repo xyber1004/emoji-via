@@ -96,7 +96,7 @@ Single-stack navigation. The `splash → home → game → results → empty` fl
 | `/done` | `EmptyScreen` | Reached from home if today is already complete. |
 | `/packs` | `PacksScreen` | Push from home; back to wherever you came from. |
 
-Use `go_router` or stock `Navigator 2.0`. No deep linking required for MVP.
+**Do not use `go_router`.** Use stock `Navigator 2.0` with a `RouterDelegate` + `RouteInformationParser`, or — preferred for this app's depth — plain `Navigator 1.0` (`Navigator.push` / `pushReplacement` / `pop`) with named routes declared in `app/router.dart`. No deep linking required for MVP, so the imperative API is fine and keeps the dependency list shorter.
 
 ---
 
@@ -228,13 +228,184 @@ Unlock conditions in the prototype (subject to product confirmation):
 
 ---
 
+## 10b. Architecture — feature-first clean architecture
+
+**The whole app is organized by feature, not by layer.** Every feature is a self-contained slice that owns its UI, state, business logic, data access, and helpers. Cross-feature imports go through a feature's public `index.dart` barrel only — never reach into another feature's internals.
+
+### 10b.1 Top-level layout
+
+```
+lib/
+├── main.dart
+├── app/                       # app shell — MaterialApp, router, theme wiring
+│   ├── app.dart
+│   ├── router.dart            # named-route table + Navigator helpers; routes delegate to feature screens
+│   └── bootstrap.dart         # runZonedGuarded, error handlers, provider overrides
+│
+├── core/                      # cross-cutting, feature-agnostic primitives ONLY
+│   ├── theme/                 # EmojiviaColors extension, text styles, radii, shadows
+│   ├── widgets/               # ChunkyButton, Mascot, Confetti, ShareCard, etc. — see §4
+│   ├── storage/               # SharedPreferences wrapper + key constants
+│   ├── result/                # Result<T, E> sealed class for service returns
+│   ├── errors/                # AppFailure hierarchy
+│   ├── utils/                 # date, random-seed, formatters
+│   └── constants/             # app-wide constants (puzzle count, hint cap, etc.)
+│
+├── features/
+│   ├── home/
+│   ├── game/
+│   ├── results/
+│   ├── streak/
+│   ├── packs/
+│   └── onboarding/
+│
+└── l10n/                      # ARB files (see §6)
+```
+
+`core/widgets/` is where the design-system components from §4 live — they are reused across features and are intentionally **dumb** (no providers, no business logic).
+
+### 10b.2 Inside a feature
+
+Every feature directory follows the **same** shape. Use this exact structure; missing files are simply omitted, never renamed.
+
+```
+features/<feature>/
+├── <feature>.dart             # barrel: exports only what other features may use
+│
+├── data/                      # outermost ring — talks to the world
+│   ├── models/                # DTOs: fromJson / toJson, no business logic
+│   │   └── puzzle_dto.dart
+│   ├── sources/               # raw IO: asset loaders, prefs reads, HTTP clients
+│   │   └── puzzle_asset_source.dart
+│   └── repositories/          # implements a domain repository contract
+│       └── puzzle_repository_impl.dart
+│
+├── domain/                    # pure Dart, zero Flutter imports
+│   ├── entities/              # business objects (Puzzle, DailySet, Streak)
+│   ├── repositories/          # ABSTRACT repository interfaces
+│   │   └── puzzle_repository.dart
+│   └── usecases/              # one class per action — GetTodayPuzzles, RecordAnswer
+│
+├── application/               # state + orchestration (Riverpod lives here)
+│   ├── providers/             # Riverpod provider declarations
+│   │   └── game_providers.dart
+│   ├── controllers/           # StateNotifier / AsyncNotifier — the state machine
+│   │   └── game_controller.dart
+│   ├── services/              # cross-usecase orchestration; pure Dart
+│   │   └── streak_service.dart
+│   └── state/                 # immutable state classes + freezed unions
+│       └── game_state.dart
+│
+├── presentation/              # everything the user sees
+│   ├── screens/               # route-level widgets (GameScreen, ResultsScreen)
+│   ├── widgets/               # feature-local widgets (AnswerOption, FeedbackSheet)
+│   └── components/            # composite widgets used in 2+ screens of this feature
+│
+└── utils/                     # feature-local helpers (shuffle seed, copy picker)
+```
+
+#### Layer rules (must hold for every feature)
+
+1. **Direction of dependency is one-way:** `presentation → application → domain ← data`. Domain depends on nothing; data implements domain interfaces.
+2. **`presentation/` never imports from `data/`.** It reads/writes through providers exposed by `application/`. Repositories are an implementation detail.
+3. **`domain/` is pure Dart** — no `package:flutter` imports, no Riverpod, no `SharedPreferences`. This lets domain be unit-tested without a Flutter binding.
+4. **Controllers don't do IO.** A controller calls a usecase (or a service); the usecase calls a repository; the repository calls a source. Controllers translate UI events into state transitions and nothing else.
+5. **Services vs usecases:**
+   - **Usecase** = one verb, one repository call (`GetTodayPuzzles`, `IncrementStreak`).
+   - **Service** = orchestrates multiple usecases or repositories (`StreakService` reads `last_played_date`, computes the new streak, writes back). Services are stateless.
+6. **Providers are the only public surface from `application/`.** Everything else in `application/` is package-private.
+7. **State classes are immutable.** Use `freezed` for unions (`GameState.asking | feedback | finished`).
+
+#### Naming conventions
+
+- Files: `snake_case.dart`. Classes: `PascalCase`. Providers: `camelCaseProvider`.
+- Repository interface: `PuzzleRepository`. Implementation: `PuzzleRepositoryImpl`.
+- Controller: `GameController extends StateNotifier<GameState>`. Its provider: `gameControllerProvider`.
+- Usecase: verb-first, `GetTodayPuzzles`, `RecordAnswer`. Call via `usecase.call(...)` or `usecase(...)`.
+
+### 10b.3 Worked example — the `game` feature
+
+Mapping the state machine in `game.jsx` onto this structure:
+
+```
+features/game/
+├── game.dart                          # exports: GameScreen, gameControllerProvider
+├── domain/
+│   ├── entities/
+│   │   ├── puzzle.dart                # Puzzle(emoji, category, hint, answer, options)
+│   │   └── answer_outcome.dart        # enum: correct | wrong
+│   ├── repositories/
+│   │   └── puzzle_repository.dart     # abstract: Future<List<Puzzle>> getToday()
+│   └── usecases/
+│       ├── get_today_puzzles.dart
+│       └── shuffle_options.dart       # deterministic shuffle (port from data.js)
+├── data/
+│   ├── models/puzzle_dto.dart         # fromJson / toJson
+│   ├── sources/puzzle_asset_source.dart   # loads assets/puzzles/2026-06-23.json
+│   └── repositories/puzzle_repository_impl.dart
+├── application/
+│   ├── state/game_state.dart          # freezed: index, results, hearts, hints, phase, picked
+│   ├── controllers/game_controller.dart   # answer(), useHint(), advance()
+│   ├── services/feedback_copy_service.dart  # randomized "Nice! 🔥" / "So close 😅"
+│   └── providers/game_providers.dart  # gameControllerProvider, todayPuzzlesProvider
+├── presentation/
+│   ├── screens/game_screen.dart       # consumes gameControllerProvider
+│   ├── widgets/
+│   │   ├── answer_option.dart
+│   │   ├── clue_card.dart
+│   │   ├── feedback_sheet.dart
+│   │   └── hearts_row.dart            # if not shared in core/widgets
+│   └── components/game_top_bar.dart
+└── utils/
+    └── seed.dart                      # seed = puzzleId * 31 + index
+```
+
+### 10b.4 Cross-feature interaction
+
+`game` finishes a run → must update streak (owned by `streak` feature) → results screen reads the new streak.
+
+- `game` does **not** import from `streak/data/` or `streak/application/internals`.
+- `game/application/controllers/game_controller.dart` calls `ref.read(streakControllerProvider.notifier).recordCompletion(date)` — a method exposed via `streak/streak.dart`.
+- `results` reads `ref.watch(streakControllerProvider)` for display.
+
+If two features need the same primitive (e.g. a `DateProvider` for "today"), it lives in `core/`, not in either feature.
+
+### 10b.5 Testing layout
+
+Mirror the source tree under `test/`:
+
+```
+test/
+├── core/
+└── features/
+    └── game/
+        ├── domain/usecases/get_today_puzzles_test.dart
+        ├── application/controllers/game_controller_test.dart   # uses ProviderContainer
+        └── presentation/screens/game_screen_test.dart          # widget test
+```
+
+Domain tests are pure Dart (`test:` package). Controller tests use `ProviderContainer` with mocked repositories. Widget tests use `pumpWidget` with provider overrides.
+
+### 10b.6 Quick decision guide
+
+| If you're adding… | Put it in |
+|---|---|
+| A new puzzle source (API, Firestore) | `features/game/data/sources/` + new repository impl |
+| A new gameplay rule (e.g. combo bonus) | `features/game/domain/usecases/` + update controller |
+| A reusable widget used by 2+ features | `core/widgets/` |
+| A widget used only inside one feature | `features/<that one>/presentation/widgets/` |
+| A persistence key | `core/storage/storage_keys.dart` |
+| A new screen for an existing feature | `features/<feature>/presentation/screens/` + route in `app/router.dart` |
+| A whole new flow (e.g. "achievements") | new `features/achievements/` with the full subtree |
+
+---
+
 ## 11. Suggested dependencies
 
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  go_router: ^14.0.0
   flutter_riverpod: ^2.5.0
   shared_preferences: ^2.2.0
   share_plus: ^10.0.0

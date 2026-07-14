@@ -26,16 +26,18 @@ class AnswerOption extends StatefulWidget {
 class _AnswerOptionState extends State<AnswerOption> {
   bool _pressed = false;
 
-  static const _drop = 4.0;
+  static const _shadowNormal = 4.0;
+  static const _pressShift = 3.0;
 
   (Color fill, Color border, Color shadow, Color text) _colors(
       EmojiviaColors ec) {
     return switch (widget.state) {
-      AnswerOptionState.idle => (ec.surface, ec.line, ec.line, ec.ink),
-      AnswerOptionState.selected => (ec.primary.withAlpha(30), ec.primary, ec.primaryDark, ec.ink),
-      AnswerOptionState.correct => (ec.good.withAlpha(30), ec.good, ec.goodDark, ec.ink),
-      AnswerOptionState.wrong => (ec.bad.withAlpha(30), ec.bad, ec.badDark, ec.ink),
-      AnswerOptionState.dimmed => (ec.surface, ec.line, Colors.transparent, ec.inkSoft),
+      AnswerOptionState.idle => (ec.paper, ec.ink, ec.ink, ec.ink),
+      AnswerOptionState.selected => (ec.yellow, ec.ink, ec.ink, ec.ink),
+      AnswerOptionState.correct => (ec.good, ec.goodDark, ec.goodDark, ec.paper),
+      AnswerOptionState.wrong => (ec.bad, ec.badDark, ec.badDark, ec.paper),
+      AnswerOptionState.dimmed =>
+        (ec.paper, ec.ink.withAlpha(60), Colors.transparent, ec.inkSoft),
     };
   }
 
@@ -43,8 +45,8 @@ class _AnswerOptionState extends State<AnswerOption> {
   Widget build(BuildContext context) {
     final ec = context.ec;
     final (fill, border, shadow, text) = _colors(ec);
-    final tappable = widget.state == AnswerOptionState.idle &&
-        widget.onTap != null;
+    final tappable =
+        widget.state == AnswerOptionState.idle && widget.onTap != null;
 
     String? semanticLabel;
     if (widget.state == AnswerOptionState.correct) {
@@ -54,6 +56,10 @@ class _AnswerOptionState extends State<AnswerOption> {
     } else if (widget.state == AnswerOptionState.selected) {
       semanticLabel = 'Selected: ${widget.label}';
     }
+
+    final shift = _pressed ? _pressShift : 0.0;
+    final shadowSize =
+        (_pressed || widget.state == AnswerOptionState.dimmed) ? 0.0 : _shadowNormal;
 
     return Semantics(
       label: semanticLabel,
@@ -70,28 +76,36 @@ class _AnswerOptionState extends State<AnswerOption> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 70),
           curve: Curves.easeOut,
-          transform: Matrix4.translationValues(0, _pressed ? _drop : 0, 0),
+          transform: Matrix4.translationValues(shift, shift, 0),
           decoration: BoxDecoration(
             color: fill,
             borderRadius: AppShape.card,
-            border: Border.all(color: border, width: 2),
-            boxShadow: (_pressed || widget.state == AnswerOptionState.dimmed)
-                ? null
-                : [BoxShadow(color: shadow, offset: Offset(0, _drop), blurRadius: 0)],
+            border: Border.all(color: border, width: 2.5),
+            boxShadow: shadowSize > 0
+                ? [
+                    BoxShadow(
+                      color: shadow,
+                      offset: Offset(shadowSize, shadowSize),
+                      blurRadius: 0,
+                    )
+                  ]
+                : null,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: border.withAlpha(30),
+                  color: border.withAlpha(40),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
-                child: Text(widget.letter,
-                    style: AppTypography.buttonS.copyWith(color: border)),
+                child: Text(
+                  widget.letter,
+                  style: AppTypography.caption.copyWith(color: text),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -100,10 +114,10 @@ class _AnswerOptionState extends State<AnswerOption> {
               ),
               if (widget.state == AnswerOptionState.correct)
                 Text('✓',
-                    style: AppTypography.title.copyWith(color: ec.goodDark)),
+                    style: AppTypography.title.copyWith(color: ec.paper)),
               if (widget.state == AnswerOptionState.wrong)
                 Text('✕',
-                    style: AppTypography.title.copyWith(color: ec.badDark)),
+                    style: AppTypography.title.copyWith(color: ec.paper)),
             ],
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
 import 'package:emojivia/core/theme/app_theme.dart';
+import 'package:emojivia/core/widgets/emoji_stage.dart';
 
 class ClueCard extends StatelessWidget {
   const ClueCard({
@@ -23,34 +24,39 @@ class ClueCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: ec.surface,
+        color: ec.paper,
         borderRadius: AppShape.heroCard,
-        border: Border.all(color: ec.line, width: 2),
+        border: Border.all(color: ec.ink, width: 3),
         boxShadow: [
-          BoxShadow(color: ec.line, offset: const Offset(0, 6), blurRadius: 0),
+          BoxShadow(color: ec.ink, offset: const Offset(5, 5), blurRadius: 0),
         ],
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
+          // Category tag: yellow pill with black border
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: ec.primary.withAlpha(30),
+              color: ec.yellow,
               borderRadius: AppShape.chip,
-              border: Border.all(color: ec.primary.withAlpha(60), width: 1.5),
+              border: Border.all(color: ec.ink, width: 1.5),
             ),
             child: Text(
               category.toUpperCase(),
-              style: AppTypography.caption.copyWith(color: ec.primaryDark),
+              style: AppTypography.caption.copyWith(color: ec.ink),
             ),
           ),
           const SizedBox(height: 20),
-          Semantics(
-            label: 'Emoji puzzle: $emoji',
-            child: Text(
-              emoji,
-              style: const TextStyle(fontSize: 64, letterSpacing: 6),
+          // Cream arcade stage with dot grid and L-bracket corners
+          EmojiStage(
+            showYellowAccent: true,
+            child: Semantics(
+              label: 'Emoji puzzle: $emoji',
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 64, letterSpacing: 6),
+              ),
             ),
           ),
           AnimatedSize(

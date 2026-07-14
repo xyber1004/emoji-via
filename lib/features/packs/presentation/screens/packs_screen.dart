@@ -35,7 +35,7 @@ class PacksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ec = context.ec;
     return Scaffold(
-      backgroundColor: ec.bg,
+      backgroundColor: ec.yellow,
       appBar: AppBar(
         title: Text('Packs', style: AppTypography.title.copyWith(color: ec.ink)),
       ),
@@ -64,7 +64,8 @@ class _PackCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (pack.unlocked) return;
-        final msg = pack.comingSoon ? 'Coming soon!' : (pack.unlockHint ?? 'Locked');
+        final msg =
+            pack.comingSoon ? 'Coming soon!' : (pack.unlockHint ?? 'Locked');
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(content: Text(msg)));
@@ -72,17 +73,11 @@ class _PackCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: AppShape.card,
-          gradient: pack.unlocked
-              ? LinearGradient(
-                  colors: [ec.primary.withAlpha(40), ec.surface],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: pack.unlocked ? null : ec.surface,
-          border: Border.all(color: ec.line, width: 2),
+          color: pack.unlocked ? ec.yellow : ec.paper,
+          border: Border.all(color: ec.ink, width: 2.5),
           boxShadow: [
-            BoxShadow(color: ec.line, offset: const Offset(0, 4), blurRadius: 0),
+            BoxShadow(
+                color: ec.ink, offset: const Offset(4, 4), blurRadius: 0),
           ],
         ),
         padding: const EdgeInsets.all(16),
@@ -98,6 +93,13 @@ class _PackCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(pack.meta,
                     style: AppTypography.meta.copyWith(color: ec.inkSoft)),
+                if (pack.unlocked) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'UNLOCKED ✓',
+                    style: AppTypography.caption.copyWith(color: ec.goodDark),
+                  ),
+                ],
               ],
             ),
             if (!pack.unlocked)
@@ -105,14 +107,16 @@ class _PackCard extends StatelessWidget {
                 top: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: pack.comingSoon ? ec.inkSoft : ec.bad,
                     borderRadius: AppShape.chip,
+                    border: Border.all(color: ec.ink, width: 1.5),
                   ),
                   child: Text(
                     pack.comingSoon ? 'Soon' : '🔒',
-                    style: AppTypography.meta.copyWith(color: Colors.white),
+                    style: AppTypography.caption.copyWith(color: ec.paper),
                   ),
                 ),
               ),

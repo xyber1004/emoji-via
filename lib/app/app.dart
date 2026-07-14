@@ -10,7 +10,7 @@ class EmojiviaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    final theme = buildTheme(EmojiviaColors.yellow);
+    final theme = buildTheme(EmojiviaColors.light);
     return MaterialApp(
       title: 'Emojivia',
       theme: theme,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
 import 'package:emojivia/core/theme/app_theme.dart';
+import 'package:emojivia/core/widgets/pixel_sprites.dart';
 
 class StreakChip extends StatelessWidget {
   const StreakChip({super.key, required this.count});
@@ -11,25 +12,74 @@ class StreakChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final ec = context.ec;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: ec.flame.withAlpha(20),
+        color: ec.yellow,
         borderRadius: AppShape.chip,
-        border: Border.all(color: ec.flame.withAlpha(60), width: 1.5),
+        border: Border.all(color: ec.ink, width: 2.5),
+        boxShadow: [
+          BoxShadow(color: ec.ink, offset: const Offset(3, 3), blurRadius: 0),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('🔥', style: TextStyle(fontSize: 15)),
-          const SizedBox(width: 4),
+          PixelFlame(color: ec.flame, pixelSize: 2.5),
+          const SizedBox(width: 6),
           Text(
-            '$count',
-            style: AppTypography.caption.copyWith(
-              color: ec.flame,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
+            count.toString().padLeft(2, '0'),
+            style: AppTypography.pixelNumeralS.copyWith(color: ec.ink),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class HintChip extends StatelessWidget {
+  const HintChip({
+    super.key,
+    required this.count,
+    required this.onTap,
+  });
+  final int count;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ec = context.ec;
+    final active = count > 0;
+    return GestureDetector(
+      onTap: active ? onTap : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? ec.paper : ec.paper.withAlpha(120),
+          borderRadius: AppShape.chip,
+          border: Border.all(
+            color: active ? ec.ink : ec.inkSoft,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '💡',
+              style: TextStyle(
+                fontSize: 13,
+                color: active ? null : ec.inkSoft,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '$count',
+              style: AppTypography.pixelNumeralS.copyWith(
+                color: active ? ec.ink : ec.inkSoft,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -62,20 +112,27 @@ class WeekStrip extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 26,
+                height: 26,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: isToday ? Border.all(color: ec.primary, width: 2) : null,
-                  color: played ? ec.flame.withAlpha(20) : Colors.transparent,
+                  color: played ? ec.flame : Colors.transparent,
+                  border: isToday
+                      ? Border.all(color: ec.yellowDeep, width: 3)
+                      : Border.all(color: ec.ink.withAlpha(50), width: 1),
                 ),
                 alignment: Alignment.center,
-                child: Text(played ? '🔥' : '', style: const TextStyle(fontSize: 16)),
+                child: played
+                    ? PixelFlame(color: ec.paper, pixelSize: 1.6)
+                    : null,
               ),
               const SizedBox(height: 4),
-              Text(label,
-                  style: AppTypography.meta
-                      .copyWith(color: isToday ? ec.primary : ec.inkSoft)),
+              Text(
+                label,
+                style: AppTypography.caption.copyWith(
+                  color: isToday ? ec.ink : ec.inkSoft,
+                ),
+              ),
             ],
           ),
         );

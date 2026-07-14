@@ -18,68 +18,67 @@ Open Emojivia → play today's 5 emoji puzzles → tap 1 of 4 answer options →
 
 ### 2.1 Color tokens (light theme)
 
-Tokens are defined as CSS variables in `styles.css` and surfaced as runtime tweaks in `app.jsx`. Port them to a Flutter `ThemeData` extension (`EmojiviaColors`). Use `oklch()` source-of-truth values; convert to sRGB hex when defining `Color(0xFFRRGGBB)`. Both themes share neutrals, good/bad, and the flame accent — only `primary` / `primaryDark` / `onPrimary` change.
+Committed palette: **textured yellow + heavy black + cream stages**. Tokens are defined as CSS variables in `styles.css`. Port them to a Flutter `ThemeData` extension (`EmojiviaColors`). Use the hex values below verbatim.
 
-| Token | Yellow theme | Coral theme |
+| Token | Hex | Role |
 |---|---|---|
-| `primary` | `oklch(0.84 0.155 88)` ≈ `#F0C24B` | `oklch(0.70 0.165 28)` ≈ `#E26A5A` |
-| `primaryDark` | `oklch(0.72 0.15 78)` ≈ `#C99A2F` | `oklch(0.60 0.165 27)` ≈ `#BD4F40` |
-| `onPrimary` | `oklch(0.30 0.04 70)` (deep brown) | `#FFFFFF` |
+| `yellow` | `#FFD84D` | Primary surface / brand color. Rendered with a subtle SVG noise texture over it (see 2.3). |
+| `yellowDeep` | `#EBC12A` | Yellow drop-shadow color on the primary CTA. |
+| `ink` | `#0F0F10` | All borders, display type, primary button fill. |
+| `paper` | `#FFFFFF` | White card surfaces. |
+| `cream` | `#FDF6D8` | **Emoji "arcade stage" backing** — the cream card behind every emoji clue so it contrasts against the yellow. Always paired with a subtle pixel-dot grid overlay. |
+| `soft` | `#FAF6EA` | Bottom-half surface on the split-hero Results screen. |
+| `inkSoft` | `#4B4740` | Secondary/meta text. |
+| `good` | `#2FBA5C` | Correct answers, checkmarks. |
+| `goodDark` | `#218C46` | Stamp text on "Nailed it". |
+| `bad` | `#E63946` | Wrong answers, X marks. |
+| `badDark` | `#B72532` | Stamp text on "Oops". |
+| `flame` | `#F26B1F` | Streak accent — pixel-art flame + streak numbers. |
 
-Fixed tokens (both themes):
-
-| Token | Value |
-|---|---|
-| `bg` (cream) | `oklch(0.972 0.018 84)` ≈ `#F8F1E3` |
-| `surface` | `oklch(0.995 0.006 84)` ≈ `#FEFCF6` |
-| `line` (borders / dividers) | `oklch(0.91 0.018 80)` ≈ `#E8E0CC` |
-| `ink` (body text) | `oklch(0.30 0.02 60)` ≈ `#3A3328` |
-| `inkSoft` (secondary text) | `oklch(0.55 0.02 60)` ≈ `#7A7160` |
-| `good` (correct) | `oklch(0.74 0.16 150)` ≈ `#4FC57A` |
-| `goodDark` | `oklch(0.62 0.15 150)` ≈ `#36A45E` |
-| `bad` (wrong) | `oklch(0.64 0.20 24)` ≈ `#E14B3D` |
-| `badDark` | `oklch(0.55 0.20 24)` ≈ `#C13A2D` |
-| `flame` (streak) | `oklch(0.72 0.18 52)` ≈ `#F08743` |
-
-**Ship the Yellow theme as default.** Coral is a brand variant kept for a future "theme picker" — wire it but hide the picker for v1.
-
-Dark theme is explicitly **post-MVP**.
+**No dark theme, no theme switcher, no coral variant.** The visual identity is a single committed direction.
 
 ### 2.2 Typography
 
+Three families. Each has ONE job — do not use them interchangeably.
+
 | Role | Font | Weight | Notes |
 |---|---|---|---|
-| Display (headlines, buttons, scores) | **Baloo 2** | 700–800 | Rounded, chunky, friendly. Bundle as TTF via `pubspec.yaml`. |
-| UI (body, captions) | **Nunito** | 600–800 | Use 800 for chips and labels, 700 for paragraphs. |
+| Display (headlines, wordmark, buttons, answer labels) | **Archivo Black** | 900 (single weight) | Chunky editorial sans. Use for everything that needs to shout. |
+| UI (body copy, secondary text) | **Nunito** | 700–800 | Round humanist for supporting text and paragraphs. |
+| Accent numerals (scores, streak count, countdown, puzzle #) | **Press Start 2P** | 400 (single weight) | Pixel arcade font. **Numerals only** — never for paragraphs. Reserve for stat values, score/streak digits, and the empty-state countdown. |
 
-Both are free on Google Fonts. **Bundle as assets** — do not load Google Fonts at runtime in production (offline + cold-start cost). Use the `google_fonts` package's `GoogleFonts.baloo2(...).copyWith(...)` only during early dev.
+All three are free on Google Fonts. **Bundle as assets** — do not load Google Fonts at runtime in production (offline + cold-start cost). Use the `google_fonts` package's `GoogleFonts.archivoBlack(...)` etc. only during early dev.
 
 Type scale (logical px / dp):
 
 | Style | Size | Weight | Family | Use |
 |---|---|---|---|---|
-| Display L | 46 | 800 | Baloo 2 | "Emojivia" on splash |
-| Display M | 34 | 800 | Baloo 2 | Home hero headline |
-| Display S | 28 | 800 | Baloo 2 | Results headline ("4/5 today") |
-| Title | 22 | 800 | Baloo 2 | Screen titles |
-| Score | 32 | 800 | Baloo 2 | Scoreboard numbers |
-| Button | 21 | 800 | Baloo 2 | Primary CTA |
-| Button S | 17 | 800 | Baloo 2 | Ghost / pill buttons |
-| Answer | 19 | 700 | Baloo 2 | Answer-option label |
-| Body | 15 | 700 | Nunito | Paragraphs |
-| Caption | 13 | 800 | Nunito | All-caps labels, uppercase letter-spacing 0.06em |
-| Meta | 12–13 | 700 | Nunito | Helper / footer text |
+| Wordmark | 72 | 900 | Archivo Black | "Emojivia" on splash |
+| Display L | 88 | 900 | Archivo Black | Big score `4/5` on results hero |
+| Display M | 32 | 900 | Archivo Black | Home hero headline |
+| Display S | 30 | 900 | Archivo Black | Results/Empty headlines |
+| Title | 22 | 900 | Archivo Black | Screen titles ("Hi there", "Category packs") |
+| Button | 18 | 900 | Archivo Black | Primary CTA, uppercase, letter-spacing 0.05em |
+| Button S | 15 | 900 | Archivo Black | Ghost button |
+| Answer | 17 | 900 | Archivo Black | Answer-option label |
+| Caps label | 11–12 | 900 | Archivo Black | All-caps section labels, letter-spacing 0.06–0.10em |
+| Body | 14–15 | 700–800 | Nunito | Feedback sheet sub-copy, hint text |
+| Pixel numeral | 20–24 | — | Press Start 2P | Streak `06`, score `04/05`, countdown `10:15:46`, puzzle `#142` |
 
-Numerals in scoreboards and countdowns: enable `FontFeature.tabularFigures()`.
+Numerals in Archivo Black also want `FontFeature.tabularFigures()` where they animate (streak +1, score tick).
 
 ### 2.3 Shape, elevation, motion
 
-- **Radius scale:** base `r = 20` (tweakable 8–30). Buttons use `r`. Cards use `r + 4`. Hero cards use `r + 14`. Chips & pills are fully rounded (`999`).
-- **3D "chunky" buttons:** no Material shadow. Solid color fill, a 4–8px **bottom drop** in the darker shade simulating depth (`box-shadow: 0 6px 0 primaryDark`). On press: translate Y by the drop amount and remove the shadow (`AnimatedContainer` with 60–80ms curve). See `.btn-primary`, `.btn-ghost`, `.btn-pill`, `.answer` in `styles.css`.
-- **No floating Material shadows.** Surfaces are flat with a 2px border in `line` plus a chunky drop. Use a custom `BoxDecoration` with `border` + `boxShadow` (one solid offset shadow, no blur).
-- **Status bar:** the prototype renders a faux iOS status bar. In Flutter use `SystemUiOverlayStyle.dark` over the cream background; do not draw your own.
-- **Tap target:** every interactive element ≥ 44dp.
-- **Motion:** entrance animations use `cubic-bezier(.2,.9,.3,1)` ≈ `Curves.easeOutCubic`-ish. Confetti: 1.1–2.2s duration, ~60 pieces by default. Wrong-answer shake: 400ms, `Curves.easeInOut`, ±7px translateX. Correct: pop scale 1.0 → 1.04 → 1.0 over 400ms.
+- **Radius scale:** buttons 14, cards 18, hero 22, emoji stage 6, chips/pills 999. Everything is **less rounded** than a typical Material app — the pixel identity leans on sharper corners.
+- **Chunky offset shadows, no blur.** Every raised surface has a solid-color drop shadow with 4–6px offset in `ink` (or `yellowDeep` on the primary CTA). Use `boxShadow: [BoxShadow(color: ink, offset: Offset(5, 5), blurRadius: 0)]`. **Never use blurred Material shadows.**
+- **Heavy black borders on everything.** 2.5–3px `ink` border on cards, chips, buttons, answer options. Use a custom `BoxDecoration` — do not rely on `Card`'s default chrome.
+- **Textured yellow background.** The main surface is `yellow` overlaid with a subtle SVG turbulence (≈20% opacity, multiply blend) that reads as very fine paper grain. In Flutter: render a `CustomPainter` with pre-baked noise, OR use a bundled 240×240 tiling noise PNG at `Opacity(0.18, BlendMode.multiply)`. Ship a `TweakToggle` to disable it (users may prefer flat).
+- **Cream "arcade stage" backing for every emoji clue.** Emojis on yellow don't read — lions/crowns/bees blend in. Every emoji clue sits inside a `#FDF6D8` panel with a 3px black border, a chunky `ink` drop shadow, four **pixel L-bracket corners** protruding from each corner, and an inner **pixel-dot grid** (10×10 grid, 1px black dot at 9% opacity). See the `EmojiStage` component in `components.jsx`.
+- **Yellow "peeking" accent** behind the cream stage: a rotated (-3°) yellow rectangle with a 2.5px black border offset so it peeks out from behind the stage — the collage/cutout look. Optional, decorative only.
+- **Pixel-art accents everywhere** — pixel L-brackets on stage corners, pixel sparkles (9px 4-point star, `image-rendering: pixelated`) floating around clues and the mascot, pixel-square progress dots (no border-radius), pixel-heart glyphs in the top bar (custom 11×10 rect grid), pixel-flame on the streak chip, pixel-check/pixel-X on the share tiles. All defined as SVG symbols in `components.jsx`'s `PixelSprite`.
+- **Status bar:** faux iOS status bar in the prototype. In Flutter use `SystemUiOverlayStyle.dark` over yellow / `.light` over the dark results hero.
+- **Tap target:** ≥ 44dp everywhere.
+- **Motion:** entrance easing `cubic-bezier(.2,.9,.3,1)` ≈ `Curves.easeOutCubic`. Buttons press-in by translating (+3, +3) and reducing shadow to 2px. Wrong-answer shakes the whole screen 400ms ±6px. Confetti: 60 pieces (of pixel squares in `flame`/`good`/`bad`/`yellowDeep`/`ink` — no rounded circles), 1.1–2.2s durations. Correct: pop scale 1 → 1.03 → 1.
 
 ---
 
@@ -104,20 +103,22 @@ Single-stack navigation. The `splash → home → game → results → empty` fl
 
 Reference files: see `components.jsx`, `screens.jsx`, `game.jsx`, `styles.css`.
 
-1. **ChunkyButton** — `primary | ghost | pill` variants. Required prop: `onTap`, `label`. Disabled state desaturates and removes shadow. Implement via `GestureDetector` + `AnimatedContainer`.
-2. **AnswerOption** — 4 states: `default | selected | correct | wrong | dimmed`. Letter key (A/B/C/D) on the left, label center-left. Border + chunky drop in state color.
-3. **Hearts** — row of 3 hearts; lost hearts grayscale + 85% scale + 28% opacity.
-4. **StreakChip / HintChip** — pill chip with emoji glyph + tabular number.
-5. **ProgressDots** — 5 dots; active = elongated pill in primary; past = green if correct, red if missed; future = neutral line.
-6. **ClueCard** — Surface card with category tag, large emoji clue (64dp, letter-spacing 6dp), optional hint paragraph.
-7. **Mascot** — emoji-in-a-bubble. Implement as a `Stack` with a radial-gradient circle, a dashed inner ring, and a centered emoji `Text`. Moods are different emojis + different `AnimationController` loops (idle bob, celebrate pop-bounce, sad droop, sleepy).
-8. **Confetti** — overlay layer that emits ~60 colored rectangles falling with random `dx`, `rotation`, `duration` from above the screen. Use `flutter_animate` or `confetti` package; or hand-roll with `CustomPaint` + a `Ticker`.
-9. **ShareCard** — gradient surface with title (`Emojivia #N`), meta line, and the result grid in one of two variants:
-   - `tiles`: five 46dp rounded squares with ✓/✕ in good/bad colors, staggered flip-in.
-   - `row`: five large 🟩 / 🟥 emojis side-by-side, exactly as the share text.
-10. **FeedbackSheet** — bottom-anchored sheet with colored top border, ico + title + sub copy + primary action. Animate from `translateY(20)` to rest. Use a separate route or an `AnimatedPositioned`.
-11. **WeekStrip** — 7 day-pips (M T W T F S S). Played days show 🔥 in flame color; today gets an outline ring.
-12. **PackCard** — 2-column grid card with icon, name, meta, lock badge. Unlocked variant has primary-tinted gradient.
+1. **ChunkyButton** — `primary | ghost | yellow` variants. Required prop: `onTap`, `label`. Primary = black fill, white text, yellow-deep offset shadow. Ghost = white fill, black border, black offset shadow. Yellow = yellow fill, black border, black offset shadow. On press: translate (+3, +3), reduce shadow to 2px. Disabled desaturates.
+2. **EmojiStage** — the cream "arcade" panel that every emoji clue sits inside. Cream background (`#FDF6D8`), inner pixel-dot grid (10×10 spacing, 9% opacity black), 3px black border, 5px offset black shadow, four **pixel L-bracket corners** SVG'd at each corner protruding −4px. Takes an optional list of pixel-sparkle overlays at specific positions/colors, and a bool for the yellow "peeking" accent block behind it.
+3. **AnswerOption** — 5 states: `default | selected | correct | wrong | dimmed`. Letter key (A/B/C/D) in a 28dp rounded-8 square on the left, label in Archivo Black 17. Correct = green fill + pixel-check trailing icon. Wrong = red fill + pixel-X trailing icon. Selected = yellow fill.
+4. **Hearts** — pill chip containing 3 **pixel-art hearts** (not ❤️ emoji — the custom 11×10 rect SVG in `bad` color). Lost hearts fade to `#d5d1c2`.
+5. **StreakChip** — yellow pill chip with **pixel-art flame** SVG in `flame` color + streak count in **Press Start 2P** (padded to 2 digits: `06`, `12`).
+6. **HintChip** — white pill chip with 💡 + count in Press Start 2P.
+7. **ProgressDots** — **pixel squares** (12×12, no border-radius). Active = elongated 30×12 in `ink`; past correct = `good`; past wrong = `bad`; future = `paper` with black border.
+8. **ClueCard** — outer card wrapping the category tag, an `EmojiStage`, and the optional hint text. Category tag is a yellow-fill pill with black border, uppercase Archivo Black 11, letter-spacing 0.1em.
+9. **Mascot** — emoji cutout on a rotated (−8°) yellow blob (`border-radius: 50% 45% 60% 40% / 50% 55% 45% 50%`) with a 2.5px black border, plus **4 pixel sparkles** twinkling around it (alternating `ink` and `flame` colors, 2.4s ease-in-out infinite with staggered delays). Moods swap the emoji and animation (idle bob, celebrate pop-bounce, sad droop, sleepy is static 😴).
+10. **Confetti** — overlay layer emitting ~60 mixed pieces: pixel squares (no border-radius) in `flame`/`good`/`bad`/`yellow`/`yellowDeep`/`ink`, plus ~30% pixel-sparkle SVGs. Random dx, rotation, 1.1–2.2s duration.
+11. **ShareCard** — yellow-gradient panel with 3px black border and chunky drop shadow. Title `Emojivia · #{n}` in Archivo Black 15. Meta `4/5 · 🔥 7 DAY STREAK` in Press Start 2P 10. Two variants:
+    - `tiles`: five 44dp rounded squares with **pixel-check / pixel-X** SVGs in white on `good`/`bad` fills, black border, staggered flip-in.
+    - `row`: five 32px 🟩 / 🟥 emojis in a row — exactly as the copied share text.
+12. **FeedbackSheet** — bottom-anchored sheet in `good` or `bad`, 3px black top border, 24 24 0 0 radius. Ico + Archivo Black title 26 + Nunito sub 14 (with `<b>` underline on the answer word). CTA is a white pill with black border and inner drop shadow. Slides up from translateY(20).
+13. **WeekStrip** — 7 26dp circles in a row (M T W T F S S in Archivo Black 10). Played days = `flame` fill with **pixel-flame** SVG in white. Today gets a 3px `yellowDeep` outline offset 2px.
+14. **PackCard** — 2-column grid card. Unlocked = yellow fill + `unlocked ✓` tag in `goodDark`. Locked = white fill, grayscaled icon, lock badge top-right (28dp circle, white, 2px border, 2px offset shadow), unlock condition in `flame` uppercase.
 
 ---
 
@@ -425,7 +426,7 @@ Avoid: any WebView, any heavy game engine, anything Material-3-decorative. Keep 
 | `Emojivia Frames.html` | Figma-style board of every screen & state. |
 | `styles.css` | Design tokens + every component's visual styles. **Read this first.** |
 | `data.js` | Puzzle set, category pack list, microcopy, deterministic shuffle. |
-| `components.jsx` | Atoms: StatusBar, buttons, Hearts, ProgressDots, Mascot, Confetti, ShareCard, WeekStrip. |
+| `components.jsx` | Atoms: `PixelSprite` (SVG symbol library — pixel heart, flame, sparkle, check, X, corner, squiggle, arrow), `EmojiStage` (cream arcade panel), StatusBar, buttons, Hearts, ProgressDots, Mascot, Confetti, ShareCard, WeekStrip. |
 | `screens.jsx` | Splash, Home, Results, Empty, Packs. |
 | `game.jsx` | Gameplay state machine + feedback states. |
 | `app.jsx` | Root: routing, tweak system, frame mode. |

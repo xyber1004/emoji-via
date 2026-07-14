@@ -22,15 +22,18 @@ class ProgressDots extends StatelessWidget {
         final isActive = i == current;
         final result = i < results.length ? results[i] : null;
 
-        Color color;
+        Color fill;
+        Color? borderColor;
+
         if (result == true) {
-          color = ec.good;
+          fill = ec.good;
         } else if (result == false) {
-          color = ec.bad;
+          fill = ec.bad;
         } else if (isActive) {
-          color = ec.primary;
+          fill = ec.ink;
         } else {
-          color = ec.line;
+          fill = ec.paper;
+          borderColor = ec.ink;
         }
 
         return Padding(
@@ -38,11 +41,14 @@ class ProgressDots extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            width: isActive ? 24 : 10,
-            height: 10,
+            width: isActive ? 30 : 12,
+            height: 12,
             decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(999),
+              color: fill,
+              borderRadius: BorderRadius.zero,
+              border: borderColor != null
+                  ? Border.all(color: borderColor, width: 1.5)
+                  : null,
             ),
           ),
         );

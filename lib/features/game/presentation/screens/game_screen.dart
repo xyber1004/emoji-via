@@ -144,7 +144,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         }
       },
       child: Scaffold(
-        backgroundColor: ec.bg,
+        backgroundColor: ec.yellow,
         body: SafeArea(
           child: ConfettiOverlay(
             trigger: _confettiTrigger,

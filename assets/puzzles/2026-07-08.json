@@ -1,0 +1,41 @@
+{
+  "id": 16,
+  "date": "2026-07-08",
+  "puzzles": [
+    {
+      "emoji": "🎬🎭🎥",
+      "category": "Movie",
+      "hint": "Bright lights, big screen.",
+      "answer": "La La Land",
+      "options": ["La La Land", "Singin' in the Rain", "Whiplash", "Moulin Rouge"]
+    },
+    {
+      "emoji": "🐻🍯🌲",
+      "category": "Story",
+      "hint": "A bear with a love for honey.",
+      "answer": "Winnie the Pooh",
+      "options": ["Winnie the Pooh", "Paddington", "Brother Bear", "Brave"]
+    },
+    {
+      "emoji": "🌮🌯🥙",
+      "category": "Food",
+      "hint": "A Mexican street-food staple.",
+      "answer": "Taco",
+      "options": ["Taco", "Burrito", "Enchilada", "Quesadilla"]
+    },
+    {
+      "emoji": "⚽🏟️🌍",
+      "category": "Sport",
+      "hint": "The world's most popular sport.",
+      "answer": "Football",
+      "options": ["Football", "Cricket", "Basketball", "Rugby"]
+    },
+    {
+      "emoji": "🎸🎵🤘",
+      "category": "Music",
+      "hint": "The story of Queen.",
+      "answer": "Bohemian Rhapsody",
+      "options": ["Bohemian Rhapsody", "Rocketman", "Yesterday", "Almost Famous"]
+    }
+  ]
+}

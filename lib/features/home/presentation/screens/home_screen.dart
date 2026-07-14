@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
     final ec = context.ec;
 
     return Scaffold(
-      backgroundColor: ec.bg,
+      backgroundColor: ec.yellow,
       appBar: AppBar(
         title: Text('Emojivia',
             style: AppTypography.title.copyWith(color: ec.ink)),

@@ -54,7 +54,7 @@ class _EmptyScreenState extends ConsumerState<EmptyScreen> {
     final runJson = storage.savedRunJson;
 
     return Scaffold(
-      backgroundColor: ec.bg,
+      backgroundColor: ec.yellow,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -75,8 +75,14 @@ class _EmptyScreenState extends ConsumerState<EmptyScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Next puzzle drops in ${_fmt(_remaining)} ⏳',
+                'Next puzzle drops in ⏳',
                 style: AppTypography.body.copyWith(color: ec.inkSoft),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _fmt(_remaining),
+                style: AppTypography.pixelNumeralM.copyWith(color: ec.ink),
                 textAlign: TextAlign.center,
               ),
               if (streak.count > 0) ...[

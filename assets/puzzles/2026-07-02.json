@@ -1,0 +1,41 @@
+{
+  "id": 10,
+  "date": "2026-07-02",
+  "puzzles": [
+    {
+      "emoji": "🚀🌌⏰",
+      "category": "Movie",
+      "hint": "Time dilates near a black hole.",
+      "answer": "Interstellar",
+      "options": ["Interstellar", "Gravity", "The Martian", "Apollo 13"]
+    },
+    {
+      "emoji": "🧊❄️👸",
+      "category": "Movie",
+      "hint": "Let it go…",
+      "answer": "Frozen",
+      "options": ["Frozen", "Moana", "Tangled", "Brave"]
+    },
+    {
+      "emoji": "🐉🧝‍♂️💍",
+      "category": "Book / Movie",
+      "hint": "One ring to rule them all.",
+      "answer": "The Lord of the Rings",
+      "options": ["The Lord of the Rings", "The Hobbit", "Eragon", "Game of Thrones"]
+    },
+    {
+      "emoji": "🃏🤡🎈",
+      "category": "Movie",
+      "hint": "Why so serious?",
+      "answer": "The Dark Knight",
+      "options": ["The Dark Knight", "Joker", "Batman Forever", "Batman v Superman"]
+    },
+    {
+      "emoji": "🎻🌹🕯️",
+      "category": "Musical",
+      "hint": "A phantom lurks beneath an opera house.",
+      "answer": "Phantom of the Opera",
+      "options": ["Phantom of the Opera", "Les Misérables", "Cats", "Chicago"]
+    }
+  ]
+}

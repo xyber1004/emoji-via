@@ -24,7 +24,7 @@ class FeedbackSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ec = context.ec;
-    final accent = isCorrect ? ec.good : ec.bad;
+    final bg = isCorrect ? ec.good : ec.bad;
 
     return AnimatedSlide(
       offset: visible ? Offset.zero : const Offset(0, 1),
@@ -36,16 +36,9 @@ class FeedbackSheet extends StatelessWidget {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: ec.surface,
+            color: bg,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border(top: BorderSide(color: accent, width: 4)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(20),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
-              ),
-            ],
+            border: Border(top: BorderSide(color: ec.ink, width: 3)),
           ),
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           child: Column(
@@ -54,13 +47,13 @@ class FeedbackSheet extends StatelessWidget {
             children: [
               Text(
                 isCorrect ? '✓  $copy' : '✕  $copy',
-                style: AppTypography.title.copyWith(color: accent),
+                style: AppTypography.title.copyWith(color: ec.paper),
               ),
               if (!isCorrect) ...[
                 const SizedBox(height: 6),
                 Text(
                   'Correct: $correctAnswer',
-                  style: AppTypography.body.copyWith(color: ec.inkSoft),
+                  style: AppTypography.body.copyWith(color: ec.paper.withAlpha(200)),
                 ),
               ],
               const SizedBox(height: 20),
@@ -68,6 +61,7 @@ class FeedbackSheet extends StatelessWidget {
                 width: double.infinity,
                 child: ChunkyButton(
                   label: isLast ? 'See results' : 'Next',
+                  variant: ChunkyButtonVariant.ghost,
                   onTap: onNext,
                 ),
               ),

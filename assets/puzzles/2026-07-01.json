@@ -1,0 +1,41 @@
+{
+  "id": 9,
+  "date": "2026-07-01",
+  "puzzles": [
+    {
+      "emoji": "🕸️🕷️🦸",
+      "category": "Movie",
+      "hint": "Your friendly neighbourhood hero.",
+      "answer": "Spider-Man",
+      "options": ["Spider-Man", "Batman", "Superman", "Ant-Man"]
+    },
+    {
+      "emoji": "🍫🏭🎩",
+      "category": "Movie",
+      "hint": "Pure imagination.",
+      "answer": "Charlie and the Chocolate Factory",
+      "options": ["Charlie and the Chocolate Factory", "Willy Wonka", "Hook", "The BFG"]
+    },
+    {
+      "emoji": "🌊🤿🐠",
+      "category": "Movie",
+      "hint": "Just keep swimming.",
+      "answer": "Finding Nemo",
+      "options": ["Finding Nemo", "Finding Dory", "The Little Mermaid", "Aquaman"]
+    },
+    {
+      "emoji": "⚡🧙📚",
+      "category": "Book / Movie",
+      "hint": "The boy who lived.",
+      "answer": "Harry Potter",
+      "options": ["Harry Potter", "The Hobbit", "Percy Jackson", "Narnia"]
+    },
+    {
+      "emoji": "🦁❤️🐺",
+      "category": "Book",
+      "hint": "A wardrobe leads to a magical land.",
+      "answer": "The Lion, the Witch and the Wardrobe",
+      "options": ["The Lion, the Witch and the Wardrobe", "The Golden Compass", "The Neverending Story", "Coraline"]
+    }
+  ]
+}

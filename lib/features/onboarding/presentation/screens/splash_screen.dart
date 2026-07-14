@@ -33,7 +33,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Widget build(BuildContext context) {
     final ec = context.ec;
     return Scaffold(
-      backgroundColor: ec.primary,
+      backgroundColor: ec.yellow,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
@@ -44,7 +44,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const SizedBox(height: 28),
               Text(
                 'Emojivia',
-                style: AppTypography.displayL.copyWith(color: ec.onPrimary),
+                style: AppTypography.wordmark.copyWith(color: ec.ink),
               )
                   .animate()
                   .fadeIn(duration: 600.ms, curve: Curves.easeOutCubic)
@@ -52,8 +52,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const SizedBox(height: 12),
               Text(
                 'Daily emoji puzzles',
-                style: AppTypography.body.copyWith(
-                    color: ec.onPrimary.withAlpha(180)),
+                style: AppTypography.body.copyWith(color: ec.inkSoft),
               )
                   .animate(delay: 200.ms)
                   .fadeIn(duration: 500.ms),

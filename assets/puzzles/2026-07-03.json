@@ -1,0 +1,41 @@
+{
+  "id": 11,
+  "date": "2026-07-03",
+  "puzzles": [
+    {
+      "emoji": "🦁👑",
+      "category": "Movie",
+      "hint": "A cub becomes king of the savanna.",
+      "answer": "The Lion King",
+      "options": ["The Lion King", "Madagascar", "The Jungle Book", "Brave"]
+    },
+    {
+      "emoji": "🤖💔🌱",
+      "category": "Movie",
+      "hint": "A lonely robot on a deserted Earth.",
+      "answer": "WALL-E",
+      "options": ["WALL-E", "Robots", "Big Hero 6", "Finch"]
+    },
+    {
+      "emoji": "🏎️💨🏆",
+      "category": "Movie",
+      "hint": "Speed is everything on the track.",
+      "answer": "Cars",
+      "options": ["Cars", "Speed Racer", "Rush", "Ford v Ferrari"]
+    },
+    {
+      "emoji": "🧁🍰🎂",
+      "category": "Food",
+      "hint": "Flour, sugar, butter, eggs — a celebration staple.",
+      "answer": "Cake",
+      "options": ["Cake", "Muffin", "Cupcake", "Pie"]
+    },
+    {
+      "emoji": "🌍🔭🪐",
+      "category": "Science",
+      "hint": "The study of the universe and celestial bodies.",
+      "answer": "Astronomy",
+      "options": ["Astronomy", "Astrology", "Cosmology", "Physics"]
+    }
+  ]
+}

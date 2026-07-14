@@ -49,23 +49,26 @@ class ShareCard extends StatelessWidget {
     final ec = context.ec;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [ec.primary.withAlpha(40), ec.surface],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: ec.yellow,
         borderRadius: AppShape.card,
-        border: Border.all(color: ec.line, width: 2),
+        border: Border.all(color: ec.ink, width: 3),
+        boxShadow: [
+          BoxShadow(color: ec.ink, offset: const Offset(5, 5), blurRadius: 0),
+        ],
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Emojivia #$puzzleId',
-              style: AppTypography.title.copyWith(color: ec.ink)),
-          const SizedBox(height: 4),
-          Text('$score/$total correct',
-              style: AppTypography.body.copyWith(color: ec.inkSoft)),
+          Text(
+            'Emojivia · #$puzzleId',
+            style: AppTypography.buttonS.copyWith(color: ec.ink),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '$score/$total correct',
+            style: AppTypography.pixelNumeralS.copyWith(color: ec.ink),
+          ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -90,15 +93,18 @@ class _ResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final ec = context.ec;
     return Container(
-      width: 46,
-      height: 46,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
         color: correct ? ec.good : ec.bad,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: ec.ink, width: 2),
       ),
       child: Center(
-        child: Text(correct ? '✓' : '✕',
-            style: AppTypography.title.copyWith(color: Colors.white)),
+        child: Text(
+          correct ? '✓' : '✕',
+          style: AppTypography.title.copyWith(color: ec.paper),
+        ),
       ),
     );
   }

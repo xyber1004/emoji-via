@@ -30,7 +30,7 @@ class ResultsScreen extends ConsumerWidget {
     final headline = FeedbackCopyService.resultsHeadline(score, total);
 
     return Scaffold(
-      backgroundColor: ec.bg,
+      backgroundColor: ec.yellow,
       body: SafeArea(
         child: ConfettiOverlay(
           trigger: isPerfect,
@@ -45,8 +45,8 @@ class ResultsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  '$score/$total today',
-                  style: AppTypography.score.copyWith(color: ec.ink),
+                  '$score/$total',
+                  style: AppTypography.displayL.copyWith(color: ec.ink),
                 ),
                 const SizedBox(height: 8),
                 Text(

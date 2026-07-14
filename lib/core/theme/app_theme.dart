@@ -3,20 +3,18 @@ import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
-const double _r = 20;
-
 ThemeData buildTheme(EmojiviaColors colors) => ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: colors.bg,
+      scaffoldBackgroundColor: colors.yellow,
       colorScheme: ColorScheme.light(
-        primary: colors.primary,
-        onPrimary: colors.onPrimary,
-        surface: colors.surface,
+        primary: colors.yellow,
+        onPrimary: colors.ink,
+        surface: colors.paper,
         onSurface: colors.ink,
       ),
       extensions: [colors],
       appBarTheme: AppBarTheme(
-        backgroundColor: colors.bg,
+        backgroundColor: colors.yellow,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -25,15 +23,16 @@ ThemeData buildTheme(EmojiviaColors colors) => ThemeData(
       ),
       textTheme: TextTheme(
         bodyMedium: AppTypography.body.copyWith(color: colors.ink),
-        bodySmall: AppTypography.caption.copyWith(color: colors.inkSoft),
+        bodySmall: AppTypography.meta.copyWith(color: colors.inkSoft),
       ),
     );
 
 class AppShape {
   AppShape._();
-  static const double r = _r;
-  static final button = BorderRadius.circular(_r);
-  static final card = BorderRadius.circular(_r + 4);
-  static final heroCard = BorderRadius.circular(_r + 14);
+
+  static final button = BorderRadius.circular(14);
+  static final card = BorderRadius.circular(18);
+  static final heroCard = BorderRadius.circular(22);
+  static final emojiStage = BorderRadius.circular(6);
   static final chip = BorderRadius.circular(999);
 }

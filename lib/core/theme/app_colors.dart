@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 @immutable
 class EmojiviaColors extends ThemeExtension<EmojiviaColors> {
   const EmojiviaColors({
-    required this.primary,
-    required this.primaryDark,
-    required this.onPrimary,
-    required this.bg,
-    required this.surface,
-    required this.line,
+    required this.yellow,
+    required this.yellowDeep,
     required this.ink,
+    required this.paper,
+    required this.cream,
+    required this.soft,
     required this.inkSoft,
     required this.good,
     required this.goodDark,
@@ -18,13 +17,12 @@ class EmojiviaColors extends ThemeExtension<EmojiviaColors> {
     required this.flame,
   });
 
-  final Color primary;
-  final Color primaryDark;
-  final Color onPrimary;
-  final Color bg;
-  final Color surface;
-  final Color line;
+  final Color yellow;
+  final Color yellowDeep;
   final Color ink;
+  final Color paper;
+  final Color cream;
+  final Color soft;
   final Color inkSoft;
   final Color good;
   final Color goodDark;
@@ -32,63 +30,61 @@ class EmojiviaColors extends ThemeExtension<EmojiviaColors> {
   final Color badDark;
   final Color flame;
 
-  static const yellow = EmojiviaColors(
-    primary: Color(0xFFF0C24B),
-    primaryDark: Color(0xFFC99A2F),
-    onPrimary: Color(0xFF4A3D1A),
-    bg: Color(0xFFF8F1E3),
-    surface: Color(0xFFFEFCF6),
-    line: Color(0xFFE8E0CC),
-    ink: Color(0xFF3A3328),
-    inkSoft: Color(0xFF7A7160),
-    good: Color(0xFF4FC57A),
-    goodDark: Color(0xFF36A45E),
-    bad: Color(0xFFE14B3D),
-    badDark: Color(0xFFC13A2D),
-    flame: Color(0xFFF08743),
-  );
-
-  static const coral = EmojiviaColors(
-    primary: Color(0xFFE26A5A),
-    primaryDark: Color(0xFFBD4F40),
-    onPrimary: Color(0xFFFFFFFF),
-    bg: Color(0xFFF8F1E3),
-    surface: Color(0xFFFEFCF6),
-    line: Color(0xFFE8E0CC),
-    ink: Color(0xFF3A3328),
-    inkSoft: Color(0xFF7A7160),
-    good: Color(0xFF4FC57A),
-    goodDark: Color(0xFF36A45E),
-    bad: Color(0xFFE14B3D),
-    badDark: Color(0xFFC13A2D),
-    flame: Color(0xFFF08743),
+  static const light = EmojiviaColors(
+    yellow: Color(0xFFFFD84D),
+    yellowDeep: Color(0xFFEBC12A),
+    ink: Color(0xFF0F0F10),
+    paper: Color(0xFFFFFFFF),
+    cream: Color(0xFFFDF6D8),
+    soft: Color(0xFFFAF6EA),
+    inkSoft: Color(0xFF4B4740),
+    good: Color(0xFF2FBA5C),
+    goodDark: Color(0xFF218C46),
+    bad: Color(0xFFE63946),
+    badDark: Color(0xFFB72532),
+    flame: Color(0xFFF26B1F),
   );
 
   @override
   EmojiviaColors copyWith({
-    Color? primary, Color? primaryDark, Color? onPrimary,
-    Color? bg, Color? surface, Color? line, Color? ink, Color? inkSoft,
-    Color? good, Color? goodDark, Color? bad, Color? badDark, Color? flame,
-  }) => EmojiviaColors(
-    primary: primary ?? this.primary, primaryDark: primaryDark ?? this.primaryDark,
-    onPrimary: onPrimary ?? this.onPrimary, bg: bg ?? this.bg,
-    surface: surface ?? this.surface, line: line ?? this.line,
-    ink: ink ?? this.ink, inkSoft: inkSoft ?? this.inkSoft,
-    good: good ?? this.good, goodDark: goodDark ?? this.goodDark,
-    bad: bad ?? this.bad, badDark: badDark ?? this.badDark, flame: flame ?? this.flame,
-  );
+    Color? yellow,
+    Color? yellowDeep,
+    Color? ink,
+    Color? paper,
+    Color? cream,
+    Color? soft,
+    Color? inkSoft,
+    Color? good,
+    Color? goodDark,
+    Color? bad,
+    Color? badDark,
+    Color? flame,
+  }) =>
+      EmojiviaColors(
+        yellow: yellow ?? this.yellow,
+        yellowDeep: yellowDeep ?? this.yellowDeep,
+        ink: ink ?? this.ink,
+        paper: paper ?? this.paper,
+        cream: cream ?? this.cream,
+        soft: soft ?? this.soft,
+        inkSoft: inkSoft ?? this.inkSoft,
+        good: good ?? this.good,
+        goodDark: goodDark ?? this.goodDark,
+        bad: bad ?? this.bad,
+        badDark: badDark ?? this.badDark,
+        flame: flame ?? this.flame,
+      );
 
   @override
   EmojiviaColors lerp(EmojiviaColors? other, double t) {
     if (other is! EmojiviaColors) return this;
     return EmojiviaColors(
-      primary: Color.lerp(primary, other.primary, t)!,
-      primaryDark: Color.lerp(primaryDark, other.primaryDark, t)!,
-      onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
-      bg: Color.lerp(bg, other.bg, t)!,
-      surface: Color.lerp(surface, other.surface, t)!,
-      line: Color.lerp(line, other.line, t)!,
+      yellow: Color.lerp(yellow, other.yellow, t)!,
+      yellowDeep: Color.lerp(yellowDeep, other.yellowDeep, t)!,
       ink: Color.lerp(ink, other.ink, t)!,
+      paper: Color.lerp(paper, other.paper, t)!,
+      cream: Color.lerp(cream, other.cream, t)!,
+      soft: Color.lerp(soft, other.soft, t)!,
       inkSoft: Color.lerp(inkSoft, other.inkSoft, t)!,
       good: Color.lerp(good, other.good, t)!,
       goodDark: Color.lerp(goodDark, other.goodDark, t)!,

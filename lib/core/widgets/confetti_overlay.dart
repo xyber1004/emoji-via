@@ -41,7 +41,7 @@ class _ConfettiOverlayState extends State<ConfettiOverlay> {
             blastDirectionality: BlastDirectionality.explosive,
             numberOfParticles: 60,
             gravity: 0.3,
-            colors: [ec.primary, ec.good, ec.flame, Colors.white, ec.primaryDark],
+            colors: [ec.yellow, ec.good, ec.bad, ec.yellowDeep, ec.ink],
           ),
         ),
       ],

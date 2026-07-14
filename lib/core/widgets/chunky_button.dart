@@ -3,7 +3,7 @@ import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
 import 'package:emojivia/core/theme/app_theme.dart';
 
-enum ChunkyButtonVariant { primary, ghost, pill }
+enum ChunkyButtonVariant { primary, ghost, yellow }
 
 class ChunkyButton extends StatefulWidget {
   const ChunkyButton({
@@ -27,7 +27,10 @@ class ChunkyButton extends StatefulWidget {
 
 class _ChunkyButtonState extends State<ChunkyButton> {
   bool _pressed = false;
-  static const _drop = 6.0;
+
+  static const _shadowNormal = 5.0;
+  static const _shadowPressed = 2.0;
+  static const _pressShift = 3.0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +38,28 @@ class _ChunkyButtonState extends State<ChunkyButton> {
     final disabled = widget.disabled || widget.onTap == null;
 
     Color fill, shadow, textColor;
-    BorderRadius radius;
+    Color? borderColor;
 
     switch (widget.variant) {
       case ChunkyButtonVariant.primary:
-        fill = disabled ? ec.line : ec.primary;
-        shadow = disabled ? Colors.transparent : ec.primaryDark;
-        textColor = disabled ? ec.inkSoft : ec.onPrimary;
-        radius = AppShape.button;
+        fill = disabled ? ec.inkSoft : ec.ink;
+        shadow = disabled ? Colors.transparent : ec.yellowDeep;
+        textColor = ec.paper;
+        borderColor = null;
       case ChunkyButtonVariant.ghost:
-        fill = ec.surface;
-        shadow = disabled ? Colors.transparent : ec.line;
+        fill = ec.paper;
+        shadow = disabled ? Colors.transparent : ec.ink;
         textColor = disabled ? ec.inkSoft : ec.ink;
-        radius = AppShape.button;
-      case ChunkyButtonVariant.pill:
-        fill = ec.surface;
-        shadow = disabled ? Colors.transparent : ec.line;
+        borderColor = ec.ink;
+      case ChunkyButtonVariant.yellow:
+        fill = disabled ? ec.inkSoft.withAlpha(40) : ec.yellow;
+        shadow = disabled ? Colors.transparent : ec.ink;
         textColor = disabled ? ec.inkSoft : ec.ink;
-        radius = AppShape.chip;
+        borderColor = ec.ink;
     }
+
+    final shift = _pressed ? _pressShift : 0.0;
+    final shadowSize = _pressed ? _shadowPressed : _shadowNormal;
 
     return GestureDetector(
       onTapDown: disabled ? null : (_) => setState(() => _pressed = true),
@@ -67,16 +73,22 @@ class _ChunkyButtonState extends State<ChunkyButton> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 70),
         curve: Curves.easeOut,
-        transform: Matrix4.translationValues(0, _pressed ? _drop : 0, 0),
+        transform: Matrix4.translationValues(shift, shift, 0),
         decoration: BoxDecoration(
           color: fill,
-          borderRadius: radius,
-          border: widget.variant != ChunkyButtonVariant.primary
-              ? Border.all(color: ec.line, width: 2)
+          borderRadius: AppShape.button,
+          border: borderColor != null
+              ? Border.all(color: borderColor, width: 2.5)
               : null,
-          boxShadow: _pressed || disabled
+          boxShadow: disabled
               ? null
-              : [BoxShadow(color: shadow, offset: Offset(0, _drop), blurRadius: 0)],
+              : [
+                  BoxShadow(
+                    color: shadow,
+                    offset: Offset(shadowSize, shadowSize),
+                    blurRadius: 0,
+                  )
+                ],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         child: Row(
@@ -85,11 +97,8 @@ class _ChunkyButtonState extends State<ChunkyButton> {
           children: [
             if (widget.icon != null) ...[widget.icon!, const SizedBox(width: 8)],
             Text(
-              widget.label,
-              style: (widget.variant == ChunkyButtonVariant.pill
-                      ? AppTypography.buttonS
-                      : AppTypography.button)
-                  .copyWith(color: textColor),
+              widget.label.toUpperCase(),
+              style: AppTypography.button.copyWith(color: textColor),
             ),
           ],
         ),

@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
+import 'package:emojivia/core/storage/storage_service.dart';
 import 'package:emojivia/core/widgets/confetti_overlay.dart';
-import 'package:emojivia/features/game/application/providers/game_providers.dart';
-import 'package:emojivia/features/game/application/state/game_state.dart';
+import 'package:emojivia/features/game/application/controllers/game_controller.dart';
+import 'package:emojivia/features/game/application/services/feedback_copy_service.dart';
+import 'package:emojivia/features/game/application/state/game_types.dart';
+import 'package:emojivia/features/game/domain/usecases/get_today_puzzles.dart';
 import 'package:emojivia/features/game/domain/usecases/shuffle_options.dart';
 import 'package:emojivia/features/game/presentation/components/game_top_bar.dart';
 import 'package:emojivia/features/game/presentation/widgets/answer_option.dart';
 import 'package:emojivia/features/game/presentation/widgets/clue_card.dart';
 import 'package:emojivia/features/game/presentation/widgets/feedback_sheet.dart';
 import 'package:emojivia/features/streak/streak.dart';
-import 'package:emojivia/core/storage/storage_provider.dart';
 import 'package:emojivia/app/router.dart';
 
-class GameScreen extends ConsumerStatefulWidget {
+class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
   @override
-  ConsumerState<GameScreen> createState() => _GameScreenState();
+  State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen>
+class _GameScreenState extends State<GameScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _shakeController;
   late Animation<double> _shakeAnim;
@@ -43,15 +45,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) => _initGame());
   }
 
-  void _initGame() {
-    final puzzleAsync = ref.read(todayPuzzleSetProvider);
-    puzzleAsync.whenData((puzzleSet) {
-      final storage = ref.read(storageServiceProvider);
-      ref.read(gameControllerProvider.notifier).startGame(
-            puzzleSet,
-            storage.hintBalance,
-          );
-    });
+  Future<void> _initGame() async {
+    final puzzleSet = await context.read<GetTodayPuzzles>()();
+    if (!mounted) return;
+    final storage = context.read<StorageService>();
+    context.read<GameController>().startGame(puzzleSet, storage.hintBalance);
   }
 
   @override
@@ -79,9 +77,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
     return result ?? false;
   }
 
-  void _handleAnswer(String option, GameState game) {
-    ref.read(gameControllerProvider.notifier).pickAnswer(option);
-    final puzzle = game.puzzleSet.puzzles[game.index];
+  void _handleAnswer(String option, GameController game) {
+    final puzzle = game.puzzleSet!.puzzles[game.index];
+    game.pickAnswer(option);
     if (option == puzzle.answer) {
       setState(() => _confettiTrigger = !_confettiTrigger);
     } else {
@@ -89,49 +87,60 @@ class _GameScreenState extends ConsumerState<GameScreen>
     }
   }
 
-  void _handleNext(GameState game) async {
-    final controller = ref.read(gameControllerProvider.notifier);
+  void _handleNext(GameController game) async {
     final run = game.toTodayRun();
-    final storage = ref.read(storageServiceProvider);
+    final storage = context.read<StorageService>();
+    final streak = context.read<StreakController>();
+    final nav = Navigator.of(context);
     await storage.saveTodayRunJson(run.toJsonString());
 
-    if (game.isOver) {
-      await ref.read(streakControllerProvider.notifier).recordCompletion(
-            game.puzzleSet.date,
-          );
+    if (game.isFinished) {
+      await streak.recordCompletion(game.puzzleSet!.date);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.results);
+      nav.pushReplacementNamed(AppRoutes.results);
     } else {
-      controller.advance();
+      game.advance();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final gameState = ref.watch(gameControllerProvider);
+    final game = context.watch<GameController>();
     final ec = context.ec;
 
-    if (gameState == null) {
+    if (!game.isStarted) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final isOver = gameState.isOver;
-    if (isOver && gameState.phase == GamePhase.feedback) {
-      // let user tap Next on feedback sheet to navigate — handled in _handleNext
+    final puzzleSet = game.puzzleSet!;
+
+    // Self-heal: if the run has advanced past the last puzzle (e.g. a restored
+    // or stale state), route straight to results instead of a blank body.
+    if (game.isComplete) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.results);
+        }
+      });
+      return Scaffold(
+        backgroundColor: ec.yellow,
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
-    final puzzle = gameState.index < gameState.puzzleSet.puzzles.length
-        ? gameState.puzzleSet.puzzles[gameState.index]
+    final isOver = game.isFinished;
+
+    final puzzle = game.index < puzzleSet.puzzles.length
+        ? puzzleSet.puzzles[game.index]
         : null;
 
     final shuffledOptions = puzzle != null
-        ? _shuffle(puzzle.options, gameState.puzzleSet.id, gameState.index)
+        ? _shuffle(puzzle.options, puzzleSet.id, game.index)
         : <String>[];
 
-    final copyService = ref.read(feedbackCopyServiceProvider);
-    final isCorrect = puzzle != null
-        ? gameState.results[gameState.index] == true
-        : false;
+    final copyService = context.read<FeedbackCopyService>();
+    final isCorrect =
+        puzzle != null ? game.results[game.index] == true : false;
 
     return PopScope(
       canPop: false,
@@ -151,13 +160,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
             child: Column(
               children: [
                 GameTopBar(
-                  hearts: gameState.hearts,
-                  hints: gameState.hints,
-                  total: gameState.puzzleSet.puzzles.length,
-                  current: gameState.index,
-                  results: gameState.results,
-                  onHint: () =>
-                      ref.read(gameControllerProvider.notifier).useHint(),
+                  hearts: game.hearts,
+                  hints: game.hints,
+                  total: puzzleSet.puzzles.length,
+                  current: game.index,
+                  results: game.results,
+                  onHint: () => game.useHint(),
                   onClose: () async {
                     final nav = Navigator.of(context);
                     final leave = await _onWillPop();
@@ -169,11 +177,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   child: puzzle == null
                       ? const Center(child: CircularProgressIndicator())
                       : _buildPuzzleBody(
-                          context, ec, gameState, puzzle.emoji,
+                          context, ec, game, puzzle.emoji,
                           puzzle.category, puzzle.hint, puzzle.answer,
                           shuffledOptions, isCorrect, copyService),
                 ),
-                if (gameState.phase == GamePhase.feedback)
+                if (game.phase == GamePhase.feedback)
                   FeedbackSheet(
                     visible: true,
                     isCorrect: isCorrect,
@@ -182,7 +190,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         : copyService.randomWrong(),
                     correctAnswer: puzzle?.answer ?? '',
                     isLast: isOver,
-                    onNext: () => _handleNext(gameState),
+                    onNext: () => _handleNext(game),
                   ),
               ],
             ),
@@ -195,14 +203,14 @@ class _GameScreenState extends ConsumerState<GameScreen>
   Widget _buildPuzzleBody(
     BuildContext context,
     EmojiviaColors ec,
-    GameState game,
+    GameController game,
     String emoji,
     String category,
     String hint,
     String answer,
     List<String> options,
     bool isCorrect,
-    dynamic copyService,
+    FeedbackCopyService copyService,
   ) {
     final letters = ['A', 'B', 'C', 'D'];
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:emojivia/app/router.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
@@ -7,25 +7,25 @@ import 'package:emojivia/core/widgets/chunky_button.dart';
 import 'package:emojivia/core/widgets/confetti_overlay.dart';
 import 'package:emojivia/core/widgets/mascot.dart';
 import 'package:emojivia/core/widgets/share_card.dart';
-import 'package:emojivia/features/game/application/providers/game_providers.dart';
-import 'package:emojivia/features/game/application/services/feedback_copy_service.dart';
+import 'package:emojivia/features/game/game.dart';
 import 'package:emojivia/features/streak/streak.dart';
 
-class ResultsScreen extends ConsumerWidget {
+class ResultsScreen extends StatelessWidget {
   const ResultsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final game = ref.watch(gameControllerProvider);
-    final streak = ref.watch(streakControllerProvider);
+  Widget build(BuildContext context) {
+    final game = context.watch<GameController>();
+    final streak = context.watch<StreakController>();
     final ec = context.ec;
 
-    if (game == null) {
+    if (!game.isStarted) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final puzzleSet = game.puzzleSet!;
     final score = game.score;
-    final total = game.puzzleSet.puzzles.length;
+    final total = puzzleSet.puzzles.length;
     final isPerfect = score == total;
     final headline = FeedbackCopyService.resultsHeadline(score, total);
 
@@ -62,7 +62,7 @@ class ResultsScreen extends ConsumerWidget {
                   ),
                 const SizedBox(height: 28),
                 ShareCard(
-                  puzzleId: game.puzzleSet.id,
+                  puzzleId: puzzleSet.id,
                   score: score,
                   total: total,
                   results: game.results,
@@ -73,7 +73,7 @@ class ResultsScreen extends ConsumerWidget {
                   child: ChunkyButton(
                     label: 'Share result',
                     onTap: () => shareResult(
-                      puzzleId: game.puzzleSet.id,
+                      puzzleId: puzzleSet.id,
                       score: score,
                       total: total,
                       streak: streak.count,

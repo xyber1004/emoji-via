@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:emojivia/app/router.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
@@ -8,14 +8,14 @@ import 'package:emojivia/core/widgets/chunky_button.dart';
 import 'package:emojivia/core/widgets/mascot.dart';
 import 'package:emojivia/features/streak/streak.dart';
 
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -23,7 +23,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   void _maybeSkip() {
-    final streak = ref.read(streakControllerProvider);
+    final streak = context.read<StreakController>();
     if (streak.introSeen) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
@@ -64,9 +64,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   variant: ChunkyButtonVariant.ghost,
                   onTap: () async {
                     final nav = Navigator.of(context);
-                    await ref
-                        .read(streakControllerProvider.notifier)
-                        .markIntroSeen();
+                    await context.read<StreakController>().markIntroSeen();
                     nav.pushReplacementNamed(AppRoutes.home);
                   },
                 ),

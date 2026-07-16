@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:emojivia/app/router.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
@@ -8,12 +8,12 @@ import 'package:emojivia/core/widgets/mascot.dart';
 import 'package:emojivia/core/widgets/streak_chip.dart';
 import 'package:emojivia/features/streak/streak.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final streak = ref.watch(streakControllerProvider);
+  Widget build(BuildContext context) {
+    final streak = context.watch<StreakController>();
     final ec = context.ec;
 
     return Scaffold(

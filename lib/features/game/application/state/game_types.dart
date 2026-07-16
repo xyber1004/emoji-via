@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:emojivia/features/game/domain/entities/daily_puzzle_set.dart';
 
 enum GamePhase { ask, feedback }
 
+/// Serialization DTO for the persisted "today's run" snapshot.
 class TodayRun {
   const TodayRun({
     required this.date,
@@ -44,41 +44,4 @@ class TodayRun {
       ranOut: m['ranOut'] as bool,
     );
   }
-}
-
-class GameState {
-  const GameState({
-    required this.puzzleSet,
-    required this.index,
-    required this.results,
-    required this.hearts,
-    required this.hints,
-    required this.hintShown,
-    this.picked,
-    required this.phase,
-  });
-
-  final DailyPuzzleSet puzzleSet;
-  final int index;
-  final List<bool?> results;
-  final int hearts;
-  final int hints;
-  final bool hintShown;
-  final String? picked;
-  final GamePhase phase;
-
-  bool get isComplete => index >= puzzleSet.puzzles.length;
-  bool get isRanOut => hearts <= 0;
-  bool get isOver => isComplete || isRanOut;
-  int get score => results.whereType<bool>().where((b) => b).length;
-
-  TodayRun toTodayRun() => TodayRun(
-        date: puzzleSet.date,
-        results: results.map((r) => r ?? false).toList(),
-        score: score,
-        total: puzzleSet.puzzles.length,
-        hearts: hearts,
-        hints: hints,
-        ranOut: isRanOut,
-      );
 }

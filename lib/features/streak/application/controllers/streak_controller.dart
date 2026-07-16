@@ -1,46 +1,59 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:emojivia/features/streak/application/providers/streak_repository_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:emojivia/features/streak/domain/entities/streak.dart';
 import 'package:emojivia/features/streak/domain/usecases/compute_streak.dart';
 import 'package:emojivia/features/streak/domain/repositories/streak_repository.dart';
-import '../state/streak_state.dart';
 
-class StreakController extends Notifier<StreakState> {
-  static const _compute = ComputeStreak();
-
-  @override
-  StreakState build() {
+/// Streak state, flattened onto the notifier. Loads initial values from the
+/// repository at construction.
+class StreakController extends ChangeNotifier {
+  StreakController(this._repo) {
     final s = _repo.load();
-    return StreakState(
-      count: s.count,
-      lastPlayedDate: s.lastPlayedDate,
-      introSeen: s.introSeen,
-      hintBalance: s.hintBalance,
-    );
+    count = s.count;
+    lastPlayedDate = s.lastPlayedDate;
+    introSeen = s.introSeen;
+    hintBalance = s.hintBalance;
   }
 
-  StreakRepository get _repo => ref.read(streakRepositoryProvider);
+  static const _compute = ComputeStreak();
+  final StreakRepository _repo;
 
-  // Public cross-feature boundary — called by game feature
+  int count = 0;
+  String? lastPlayedDate;
+  bool introSeen = false;
+  int hintBalance = 0;
+
+  bool get playedToday {
+    if (lastPlayedDate == null) return false;
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    return lastPlayedDate == today;
+  }
+
+  // Public cross-feature boundary — called by the game feature.
   Future<void> recordCompletion(String date) async {
     final entity = Streak(
-      count: state.count,
-      lastPlayedDate: state.lastPlayedDate,
-      introSeen: state.introSeen,
-      hintBalance: state.hintBalance,
+      count: count,
+      lastPlayedDate: lastPlayedDate,
+      introSeen: introSeen,
+      hintBalance: hintBalance,
     );
     final newCount = _compute(entity, date);
-    final updated = Streak(
-      count: newCount,
-      lastPlayedDate: date,
-      introSeen: state.introSeen,
-      hintBalance: state.hintBalance,
+    count = newCount;
+    lastPlayedDate = date;
+    notifyListeners();
+    await _repo.save(
+      Streak(
+        count: newCount,
+        lastPlayedDate: date,
+        introSeen: introSeen,
+        hintBalance: hintBalance,
+      ),
     );
-    state = state.copyWith(count: newCount, lastPlayedDate: date);
-    await _repo.save(updated);
   }
 
   Future<void> markIntroSeen() async {
-    state = state.copyWith(introSeen: true);
+    introSeen = true;
+    notifyListeners();
   }
 }

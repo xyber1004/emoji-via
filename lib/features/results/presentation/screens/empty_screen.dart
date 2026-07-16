@@ -1,23 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:emojivia/app/router.dart';
-import 'package:emojivia/core/storage/storage_provider.dart';
+import 'package:emojivia/core/storage/storage_service.dart';
 import 'package:emojivia/core/theme/app_colors.dart';
 import 'package:emojivia/core/theme/app_typography.dart';
 import 'package:emojivia/core/widgets/chunky_button.dart';
 import 'package:emojivia/core/widgets/share_card.dart';
 import 'package:emojivia/features/streak/streak.dart';
 
-class EmptyScreen extends ConsumerStatefulWidget {
+class EmptyScreen extends StatefulWidget {
   const EmptyScreen({super.key});
 
   @override
-  ConsumerState<EmptyScreen> createState() => _EmptyScreenState();
+  State<EmptyScreen> createState() => _EmptyScreenState();
 }
 
-class _EmptyScreenState extends ConsumerState<EmptyScreen> {
+class _EmptyScreenState extends State<EmptyScreen> {
   Duration _remaining = Duration.zero;
   Timer? _timer;
 
@@ -48,8 +48,8 @@ class _EmptyScreenState extends ConsumerState<EmptyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final streak = ref.watch(streakControllerProvider);
-    final storage = ref.read(storageServiceProvider);
+    final streak = context.watch<StreakController>();
+    final storage = context.read<StorageService>();
     final ec = context.ec;
     final runJson = storage.savedRunJson;
 

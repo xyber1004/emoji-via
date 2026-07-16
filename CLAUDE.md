@@ -164,9 +164,9 @@ The prototype has 5 hard-coded puzzles in `data.js`. For production:
 - If `last_played_date` is older than yesterday: streak resets to 1.
 - Today already played: home shows "View recap" → `EmptyScreen`.
 
-### 5.3 In-game state (Riverpod or Bloc)
+### 5.3 In-game state (`provider` — ChangeNotifier)
 
-`GameNotifier` holds: `index`, `results[]`, `hearts`, `hints`, `hintShown`, `picked`, `phase: ask | feedback`. Mirror the state machine in `game.jsx` directly.
+State management uses the pub.dev **`provider`** package (not Riverpod/Bloc). `GameController extends ChangeNotifier` holds the flattened fields directly — `index`, `results[]`, `hearts`, `hints`, `hintShown`, `picked`, `phase: ask | feedback` — and calls `notifyListeners()` after each mutation. Mirror the state machine in `game.jsx` directly. Widgets read state with `context.watch<GameController>()` and invoke methods with `context.read<GameController>()`.
 
 ---
 
@@ -287,15 +287,13 @@ features/<feature>/
 │   │   └── puzzle_repository.dart
 │   └── usecases/              # one class per action — GetTodayPuzzles, RecordAnswer
 │
-├── application/               # state + orchestration (Riverpod lives here)
-│   ├── providers/             # Riverpod provider declarations
-│   │   └── game_providers.dart
-│   ├── controllers/           # StateNotifier / AsyncNotifier — the state machine
+├── application/               # state + orchestration (provider/ChangeNotifier lives here)
+│   ├── controllers/           # ChangeNotifier — the state machine (holds flattened state)
 │   │   └── game_controller.dart
 │   ├── services/              # cross-usecase orchestration; pure Dart
 │   │   └── streak_service.dart
-│   └── state/                 # immutable state classes + freezed unions
-│       └── game_state.dart
+│   └── state/                 # shared enums / serialization DTOs
+│       └── game_types.dart
 │
 ├── presentation/              # everything the user sees
 │   ├── screens/               # route-level widgets (GameScreen, ResultsScreen)
@@ -308,20 +306,20 @@ features/<feature>/
 #### Layer rules (must hold for every feature)
 
 1. **Direction of dependency is one-way:** `presentation → application → domain ← data`. Domain depends on nothing; data implements domain interfaces.
-2. **`presentation/` never imports from `data/`.** It reads/writes through providers exposed by `application/`. Repositories are an implementation detail.
-3. **`domain/` is pure Dart** — no `package:flutter` imports, no Riverpod, no `SharedPreferences`. This lets domain be unit-tested without a Flutter binding.
+2. **`presentation/` never imports from `data/`.** It reads/writes through controllers exposed by `application/` (via `context.read` / `context.watch`). Repositories are an implementation detail.
+3. **`domain/` is pure Dart** — no `package:flutter` imports, no `provider`, no `SharedPreferences`. This lets domain be unit-tested without a Flutter binding.
 4. **Controllers don't do IO.** A controller calls a usecase (or a service); the usecase calls a repository; the repository calls a source. Controllers translate UI events into state transitions and nothing else.
 5. **Services vs usecases:**
    - **Usecase** = one verb, one repository call (`GetTodayPuzzles`, `IncrementStreak`).
    - **Service** = orchestrates multiple usecases or repositories (`StreakService` reads `last_played_date`, computes the new streak, writes back). Services are stateless.
-6. **Providers are the only public surface from `application/`.** Everything else in `application/` is package-private.
-7. **State classes are immutable.** Use `freezed` for unions (`GameState.asking | feedback | finished`).
+6. **Controllers are the public surface from `application/`.** They are registered in the root `MultiProvider` (`core/di/app_providers.dart`) and exposed through each feature's barrel. Everything else in `application/` is package-private.
+7. **State is flattened onto the `ChangeNotifier` controller.** Fields + computed getters live on the controller; `notifyListeners()` drives rebuilds. Serialization DTOs and shared enums live in `application/state/`.
 
 #### Naming conventions
 
-- Files: `snake_case.dart`. Classes: `PascalCase`. Providers: `camelCaseProvider`.
+- Files: `snake_case.dart`. Classes: `PascalCase`.
 - Repository interface: `PuzzleRepository`. Implementation: `PuzzleRepositoryImpl`.
-- Controller: `GameController extends StateNotifier<GameState>`. Its provider: `gameControllerProvider`.
+- Controller: `GameController extends ChangeNotifier`. Registered as `ChangeNotifierProvider<GameController>` in the root `MultiProvider`.
 - Usecase: verb-first, `GetTodayPuzzles`, `RecordAnswer`. Call via `usecase.call(...)` or `usecase(...)`.
 
 ### 10b.3 Worked example — the `game` feature
@@ -330,7 +328,7 @@ Mapping the state machine in `game.jsx` onto this structure:
 
 ```
 features/game/
-├── game.dart                          # exports: GameScreen, gameControllerProvider
+├── game.dart                          # exports: GameScreen, GameController
 ├── domain/
 │   ├── entities/
 │   │   ├── puzzle.dart                # Puzzle(emoji, category, hint, answer, options)
@@ -345,12 +343,11 @@ features/game/
 │   ├── sources/puzzle_asset_source.dart   # loads assets/puzzles/2026-06-23.json
 │   └── repositories/puzzle_repository_impl.dart
 ├── application/
-│   ├── state/game_state.dart          # freezed: index, results, hearts, hints, phase, picked
-│   ├── controllers/game_controller.dart   # answer(), useHint(), advance()
-│   ├── services/feedback_copy_service.dart  # randomized "Nice! 🔥" / "So close 😅"
-│   └── providers/game_providers.dart  # gameControllerProvider, todayPuzzlesProvider
+│   ├── state/game_types.dart          # GamePhase enum + TodayRun serialization DTO
+│   ├── controllers/game_controller.dart   # ChangeNotifier: flattened state + pickAnswer(), useHint(), advance()
+│   └── services/feedback_copy_service.dart  # randomized "Nice! 🔥" / "So close 😅"
 ├── presentation/
-│   ├── screens/game_screen.dart       # consumes gameControllerProvider
+│   ├── screens/game_screen.dart       # context.watch<GameController>()
 │   ├── widgets/
 │   │   ├── answer_option.dart
 │   │   ├── clue_card.dart
@@ -366,8 +363,8 @@ features/game/
 `game` finishes a run → must update streak (owned by `streak` feature) → results screen reads the new streak.
 
 - `game` does **not** import from `streak/data/` or `streak/application/internals`.
-- `game/application/controllers/game_controller.dart` calls `ref.read(streakControllerProvider.notifier).recordCompletion(date)` — a method exposed via `streak/streak.dart`.
-- `results` reads `ref.watch(streakControllerProvider)` for display.
+- `GameScreen` calls `context.read<StreakController>().recordCompletion(date)` — a method exposed via `streak/streak.dart` — when a run finishes.
+- `results` reads `context.watch<StreakController>()` for display.
 
 If two features need the same primitive (e.g. a `DateProvider` for "today"), it lives in `core/`, not in either feature.
 
@@ -381,11 +378,11 @@ test/
 └── features/
     └── game/
         ├── domain/usecases/get_today_puzzles_test.dart
-        ├── application/controllers/game_controller_test.dart   # uses ProviderContainer
+        ├── application/controllers/game_controller_test.dart   # instantiate controller directly
         └── presentation/screens/game_screen_test.dart          # widget test
 ```
 
-Domain tests are pure Dart (`test:` package). Controller tests use `ProviderContainer` with mocked repositories. Widget tests use `pumpWidget` with provider overrides.
+Domain tests are pure Dart (`test:` package). Controller tests instantiate the `ChangeNotifier` directly with mocked repositories and assert on its fields / `notifyListeners` calls. Widget tests use `pumpWidget` wrapped in a `MultiProvider` (or `ChangeNotifierProvider.value`) with mocked controllers.
 
 ### 10b.6 Quick decision guide
 
@@ -407,7 +404,7 @@ Domain tests are pure Dart (`test:` package). Controller tests use `ProviderCont
 dependencies:
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.5.0
+  provider: ^6.1.0
   shared_preferences: ^2.2.0
   share_plus: ^10.0.0
   flutter_animate: ^4.5.0      # mascot loops, screen transitions

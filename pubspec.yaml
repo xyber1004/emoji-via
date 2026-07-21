@@ -17,6 +17,7 @@ dependencies:
   confetti: ^0.7.0
   google_fonts: ^6.2.1
   supabase_flutter: ^2.16.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +28,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/puzzles/
+    - .env.local

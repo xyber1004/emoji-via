@@ -1,3 +1,4 @@
+import 'package:emojivia/features/auth/presentation/screens/save_streak_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:emojivia/app/router.dart';
@@ -8,8 +9,29 @@ import 'package:emojivia/core/widgets/mascot.dart';
 import 'package:emojivia/core/widgets/streak_chip.dart';
 import 'package:emojivia/features/streak/streak.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});  
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// USE THIS ONLY TO CHECK LOGIN
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   showModalBottomSheet(
+    //     context: context,
+    //     isScrollControlled: true,
+    //     backgroundColor: Colors.transparent,
+    //     builder: (_) => const SaveStreakScreen(),
+    //   );
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {

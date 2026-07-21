@@ -78,6 +78,56 @@ class PixelSparkle extends StatelessWidget {
   }
 }
 
+// Pixel-art X / cross — 7×7 grid, used for missed days & wrong tiles
+class PixelCross extends StatelessWidget {
+  const PixelCross({super.key, required this.color, this.pixelSize = 2.0});
+  final Color color;
+  final double pixelSize;
+
+  static const _grid = [
+    [1, 1, 0, 0, 0, 1, 1],
+    [1, 1, 1, 0, 1, 1, 1],
+    [0, 1, 1, 1, 1, 1, 0],
+    [0, 0, 1, 1, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 0, 1, 1, 1],
+    [1, 1, 0, 0, 0, 1, 1],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(7 * pixelSize, 7 * pixelSize),
+      painter: _GridPainter(grid: _grid, color: color),
+    );
+  }
+}
+
+// Pixel-art check — 7×7 grid, used for correct tiles & unlocks
+class PixelCheck extends StatelessWidget {
+  const PixelCheck({super.key, required this.color, this.pixelSize = 2.0});
+  final Color color;
+  final double pixelSize;
+
+  static const _grid = [
+    [0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 0],
+    [1, 1, 0, 1, 1, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(7 * pixelSize, 7 * pixelSize),
+      painter: _GridPainter(grid: _grid, color: color),
+    );
+  }
+}
+
 // Twinkling sparkle with staggered pulse animation
 class TwinklingSparkle extends StatelessWidget {
   const TwinklingSparkle({

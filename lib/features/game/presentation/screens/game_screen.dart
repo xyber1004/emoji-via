@@ -14,6 +14,7 @@ import 'package:emojivia/features/game/presentation/widgets/answer_option.dart';
 import 'package:emojivia/features/game/presentation/widgets/clue_card.dart';
 import 'package:emojivia/features/game/presentation/widgets/feedback_sheet.dart';
 import 'package:emojivia/features/streak/streak.dart';
+import 'package:emojivia/features/awards/awards.dart';
 import 'package:emojivia/app/router.dart';
 
 class GameScreen extends StatefulWidget {
@@ -91,11 +92,21 @@ class _GameScreenState extends State<GameScreen>
     final run = game.toTodayRun();
     final storage = context.read<StorageService>();
     final streak = context.read<StreakController>();
+    final stats = context.read<StatsController>();
+    final awards = context.read<AwardsController>();
     final nav = Navigator.of(context);
     await storage.saveTodayRunJson(run.toJsonString());
 
     if (game.isFinished) {
       await streak.recordCompletion(game.puzzleSet!.date);
+      await stats.recordRun(run: run, streakCount: streak.count);
+      await awards.evaluate(
+        currentStreak: streak.count,
+        longestStreak: stats.longestStreak,
+        puzzlesPlayed: stats.puzzlesPlayed,
+        perfectDays: stats.perfectDays,
+        sharesSent: stats.sharesSent,
+      );
       if (!mounted) return;
       nav.pushReplacementNamed(AppRoutes.results);
     } else {

@@ -84,18 +84,33 @@ Numerals in Archivo Black also want `FontFeature.tabularFigures()` where they an
 
 ## 3. Screen inventory & navigation
 
-Single-stack navigation. The `splash → home → game → results → empty` flow is the spine; `packs` is a side route.
+Two-layer navigation:
 
-| Route | Widget | Notes |
-|---|---|---|
-| `/` | `SplashScreen` | Auto-skip after first launch when streak data exists. |
-| `/home` | `HomeScreen` | Shows "Play today's 5" or "View recap" if already played today. |
-| `/play` | `GameScreen` | Internal state machine for 5 puzzles. Pop guarded by confirm dialog. |
-| `/results` | `ResultsScreen` | Push-replace from `/play` so back goes home. |
-| `/done` | `EmptyScreen` | Reached from home if today is already complete. |
-| `/packs` | `PacksScreen` | Push from home; back to wherever you came from. |
+- **Bottom tab bar** (persistent shell) — Play · Stats · Packs · Awards · More. These five destinations always share the tab bar and never push over each other. Use an `IndexedStack` (state preserved) or `PageStorage` + a single `Navigator`.
+- **Immersive routes** (no tab bar) — Splash, Game, Results, Empty, How-to-play. These are focused states you push over the shell and pop back from.
+
+| Route | Widget | Shell | Notes |
+|---|---|---|---|
+| `/` | `SplashScreen` | — | Full-bleed. Auto-skip after first launch when streak data exists. |
+| `/home` (Play tab) | `HomeScreen` | tabbed | Shows "Play today's 5" or "View recap" if already played today. Default tab. |
+| `/stats` (Stats tab) | `StatsScreen` | tabbed | 6 KPI tiles + score histogram + rolling 9-day streak strip. |
+| `/packs` (Packs tab) | `PacksScreen` | tabbed | Grid of unlocked/locked packs. Also reachable from Settings and post-game. |
+| `/awards` (Awards tab) | `AchievementsScreen` | tabbed | Unlocks list. Show a `1`-style pixel badge on the tab icon when there are un-viewed unlocks (persist `awards_seen_at`). |
+| `/more` (More tab) | `SettingsScreen` | tabbed | Preferences + Help + About. |
+| `/play` | `GameScreen` | immersive | Internal state machine for 5 puzzles. Pop guarded by confirm dialog. |
+| `/results` | `ResultsScreen` | immersive | Push-replace from `/play` so back goes home. |
+| `/done` | `EmptyScreen` | immersive | Reached from home if today is already complete. |
+| `/howto` | `HowToScreen` | immersive | 5-step onboarding tour. Reached from Settings, and can be shown once on first launch. |
 
 **Do not use `go_router`.** Use stock `Navigator 2.0` with a `RouterDelegate` + `RouteInformationParser`, or — preferred for this app's depth — plain `Navigator 1.0` (`Navigator.push` / `pushReplacement` / `pop`) with named routes declared in `app/router.dart`. No deep linking required for MVP, so the imperative API is fine and keeps the dependency list shorter.
+
+**Tab-bar behavior (must-haves):**
+- Tap on the current tab = scroll that tab's content to top.
+- Switching tabs preserves each tab's scroll position (use `IndexedStack` or `AutomaticKeepAliveClientMixin`).
+- The tab bar sits on `paper` with a 3px `ink` top border, ~8dp horizontal padding, and respects `MediaQuery.padding.bottom` (home indicator).
+- Active tab is filled `yellow` with an `ink` border and a chunky 3px `ink` offset shadow — same shape language as the buttons. Inactive tabs are transparent, `ink` icon + label.
+- Tab icons are emoji glyphs (`🏠 📊 🎒 🏆 ⋯`) sized 20dp; labels are Archivo Black 9dp, up2percase, letter-spacing 0.08em.
+- Badge on Awards tab when there's a newly-unlocked achievement: a 16dp pill in `flame` with `ink` border, Press Start 2P count.
 
 ---
 
@@ -119,6 +134,14 @@ Reference files: see `components.jsx`, `screens.jsx`, `game.jsx`, `styles.css`.
 12. **FeedbackSheet** — bottom-anchored sheet in `good` or `bad`, 3px black top border, 24 24 0 0 radius. Ico + Archivo Black title 26 + Nunito sub 14 (with `<b>` underline on the answer word). CTA is a white pill with black border and inner drop shadow. Slides up from translateY(20).
 13. **WeekStrip** — 7 26dp circles in a row (M T W T F S S in Archivo Black 10). Played days = `flame` fill with **pixel-flame** SVG in white. Today gets a 3px `yellowDeep` outline offset 2px.
 14. **PackCard** — 2-column grid card. Unlocked = yellow fill + `unlocked ✓` tag in `goodDark`. Locked = white fill, grayscaled icon, lock badge top-right (28dp circle, white, 2px border, 2px offset shadow), unlock condition in `flame` uppercase.
+15. **TabBar** — the persistent bottom shell (see §3). One button per tab; active state = yellow fill + ink border + 3px offset shadow. Icons are emoji, labels Archivo Black 9dp uppercase. Handles a numeric `flame` badge overlay per tab. Sits above `MediaQuery.padding.bottom`.
+16. **BigStatTile** (Stats screen) — 20dp radius card with 3px ink border and 6px offset shadow. Two-line: caps-label (Archivo Black 10dp, 0.08em tracking, opacity 0.7) + big value in Press Start 2P at ~26dp. Flame variant colors the value in `flame`.
+17. **ScoreHistogram** (Stats screen) — 6 vertical bars labeled `0/5 … 5/5` with the tallest bar in `good`, others in `yellow`, all with 2px ink border and no bottom border (they "stand on" the card floor). Value label in Press Start 2P 8dp above each bar; `x/5` label in Press Start 2P 8dp below each bar.
+18. **StreakRow** (Stats screen) — 9 rounded-4dp 22dp squares in a row for the last 9 days. States: `hit` (flame with pixel-flame glyph), `miss` (bad, opacity 0.5, pixel-X glyph), `gap` (paper with 45° hatched fill). Reads left → right, oldest → today.
+19. **AchievementRow** (Awards screen) — horizontal row: 44dp rounded-10 icon tile with ink border + 2px offset shadow (unlocked = cream; locked = grayscale glyph + 0.7 opacity), title (Archivo Black 15dp), description (Nunito 700 12dp, 75% opacity), and a right-aligned progress pill (`3/3`, `6/7`, `0/1`) in Press Start 2P 9dp — pill goes `good` fill + white text when unlocked, otherwise paper + ink border. Row background = yellow when unlocked, paper when locked.
+20. **HowToStep** (How-to-play screen) — 18dp radius card with 3px ink border and 6px offset shadow. A pixel step tag (`01`, `02`…) in Press Start 2P sits at `top:-14px; left:14px`, filled `ink` with `yellow` text and 2px ink border. Below: Archivo Black 18dp headline + Nunito 700 13dp paragraph + a mini visual demo panel (cream fill, 2px ink border, ~60dp min height) that shows an example emoji clue, answer button, hint line, streak strip, or share grid.
+21. **SettingsGroup + SettingRow** (More screen) — grouped card: 18dp radius, 3px ink border, 6px offset shadow, `overflow: hidden`. First line inside is the group header (Archivo Black 11dp, uppercase, 0.1em tracking, 65% opacity). Rows are separated by a 2px ink top border (except the first). Each row is `label (name + description) + control` at 14dp vertical padding. Descriptions use Nunito 700 12dp at 65% opacity.
+22. **PixelToggle** — 46×26dp pill with 2px ink border and 2px offset shadow. `off` = paper background, knob rests at `left: 2px`; `on` = yellow background, knob translates right by 20px. Knob is an 18dp ink circle. Transition: 180ms, `Curves.easeOutCubic`. Do NOT use Material `Switch` — write a custom widget so the shape/border/shadow match the app's language.
 
 ---
 
@@ -153,10 +176,17 @@ The prototype has 5 hard-coded puzzles in `data.js`. For production:
 | Key | Type | Notes |
 |---|---|---|
 | `streak_count` | int | Days in a row played. |
+| `longest_streak` | int | Best streak ever seen — shown on Stats. |
 | `last_played_date` | ISO date | Used to detect streak break + already-played-today. |
 | `today_run` | JSON | `{date, results: bool[], score, total, hearts, hints, ranOut}` — restore mid-run if user backgrounds the app. |
 | `hint_balance` | int | Daily, resets at midnight local. Default 2/day. |
 | `intro_seen` | bool | Skip splash CTA after first launch. |
+| `howto_seen` | bool | Show `HowToScreen` automatically on first launch when false; set true after user finishes it. |
+| `stats_totals` | JSON | Aggregated counters: `{ puzzlesPlayed, puzzlesCorrect, perfectDays, hintsUsed, sharesSent, scoreHistogram: int[6] }`. Update after each daily run. |
+| `stats_recent_days` | JSON | Rolling 9-slot ring buffer: `bool[]` (`true` = played + completed, `false` = missed, `null` = future). Powers the "Last 9 days" strip. |
+| `achievements_unlocked` | JSON | `{ [achievementId]: unlockedIso }`. Awards screen shows a badge on the tab if `Object.keys(this).length > awards_seen_at_count`. |
+| `awards_seen_at_count` | int | Snapshot of unlock count last time the user visited Awards. Used to render the tab badge. |
+| `settings` | JSON | `{ sound: bool, haptics: bool, dailyReminder: bool, reducedMotion: bool, yellowTexture: bool }`. |
 
 **Streak rules:**
 - Increment on the first puzzle completed today.
@@ -424,10 +454,44 @@ Avoid: any WebView, any heavy game engine, anything Material-3-decorative. Keep 
 | `styles.css` | Design tokens + every component's visual styles. **Read this first.** |
 | `data.js` | Puzzle set, category pack list, microcopy, deterministic shuffle. |
 | `components.jsx` | Atoms: `PixelSprite` (SVG symbol library — pixel heart, flame, sparkle, check, X, corner, squiggle, arrow), `EmojiStage` (cream arcade panel), StatusBar, buttons, Hearts, ProgressDots, Mascot, Confetti, ShareCard, WeekStrip. |
-| `screens.jsx` | Splash, Home, Results, Empty, Packs. |
+| `screens.jsx` | Splash, Home, Results, Empty, Packs, **Stats, Achievements, HowTo, Settings**, and the **TabBar** shell. |
 | `game.jsx` | Gameplay state machine + feedback states. |
-| `app.jsx` | Root: routing, tweak system, frame mode. |
+| `app.jsx` | Root: routing, tweak system, frame mode, tab-nav shell. |
 | `tweaks-panel.jsx` | Live-tweak panel scaffolding (ignored at build). |
+
+---
+
+## 14. Screens that exist in the prototype (feature checklist)
+
+One row per screen. Owner is the Flutter feature slice it lives in (see §10b). "Live in HTML" means the prototype renders this fully today; "Missing UI" flags anything a Flutter engineer should not just port — they must design/build it.
+
+| Screen | Owner feature | Live in HTML | Missing UI to still design |
+|---|---|---|---|
+| Splash | `onboarding` | ✅ | Real app icon glyph (currently uses 🤓). App-store screenshots. |
+| How to play | `onboarding` | ✅ | Skip / "never show again" toggle. "Show on first launch" gating logic. |
+| Home (Play tab) | `home` | ✅ | "Streak at risk" banner when it's past 6pm and the user hasn't played. Optional weekly-recap teaser card on Sundays. |
+| Gameplay · asking | `game` | ✅ | Quit-confirm dialog (currently ✕ button quits instantly). |
+| Gameplay · hint revealed | `game` | ✅ | — |
+| Gameplay · correct feedback | `game` | ✅ | Sound / haptic hooks (design ships, wiring is TODO). |
+| Gameplay · wrong feedback | `game` | ✅ | — |
+| Gameplay · out of hearts | `game` | ❌ | End-of-run screen when hearts hit 0 mid-day. Currently the engine handles it (`ranOut: true`) but jumps to Results. Design a dedicated "See you tomorrow" screen with revive-with-ad or wait-for-tomorrow choice (revive is post-MVP). |
+| Results | `results` | ✅ | Achievement-unlocked toast when a run triggers one ("🏆 On Fire unlocked!"). |
+| Empty / already-done | `results` | ✅ | — |
+| Stats | `streak` | ✅ | Yearly heatmap (contribution-graph style) is planned — not built yet. Filters (all-time vs this-month) are not built. |
+| Category packs | `packs` | ✅ | Pack detail screen when a user taps an unlocked pack. Currently shows a toast; needs a screen listing that pack's puzzles + a play CTA. Locked-pack teaser modal too. |
+| Achievements (Awards) | `streak` (or new `awards` slice) | ✅ | Unlock celebration modal (fullscreen popover with the badge + "Share this" CTA). |
+| More / Settings | `settings` (new slice) | ✅ | Actual `About` / legal pages behind the About row: Privacy, Terms, Credits, Version notes. Send-feedback screen (currently a toast). Account/profile is out of scope for MVP. |
+| Onboarding tour first-run | `onboarding` | ❌ | The tour exists (`HowToScreen`), but it's not wired to run automatically after Splash on first launch. Add the `howto_seen` gate (§5.2) and the flow in `app/router.dart`. |
+| Streak-lost / repair | `streak` | ❌ | "Your streak broke" screen when returning after a missed day. Show the count that broke, a warm "start again" CTA, no punishment. Post-MVP: a paid streak-freeze. |
+| Notification permission prompt | `settings` | ❌ | Native permission ask when the user flips "Daily reminder" ON. Design a pre-prompt bottom sheet ("we'll ping you once at 9am, that's it") so we don't burn the OS prompt. |
+| Share sheet | `results` | partial | Native `share_plus` sheet handles the OS surface. The **fallback in-app modal** (for platforms that reject share) is not designed — show the composed text with a Copy button. |
+| Empty tab states | `stats`, `packs`, `awards` | ❌ | Day-1 users have no stats, no unlocks, no unlocked packs. Design a friendly empty state per tab (mascot + "Play today's 5 to start filling this in" CTA). |
+
+---
+
+## 15. Recent changes to this doc
+
+- **2026-07-17** — Added bottom-nav shell (§3), Stats / Awards / How-to / Settings screens (§4 items 15–22), new persistence keys for stats + achievements + settings (§5.2), and this Missing-UI checklist (§14).
 
 ---
 

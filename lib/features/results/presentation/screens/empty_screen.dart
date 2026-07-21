@@ -125,16 +125,18 @@ class _EmptyScreenState extends State<EmptyScreen> {
     }
   }
 
-  void _share(String runJson, int streakCount) {
+  Future<void> _share(String runJson, int streakCount) async {
     try {
       final m = jsonDecode(runJson) as Map<String, dynamic>;
-      shareResult(
+      await shareResult(
         puzzleId: (m['id'] as int?) ?? 0,
         score: m['score'] as int,
         total: m['total'] as int,
         streak: streakCount,
         results: (m['results'] as List).cast<bool>(),
       );
+      if (!mounted) return;
+      await context.read<StatsController>().recordShare();
     } catch (_) {}
   }
 }
